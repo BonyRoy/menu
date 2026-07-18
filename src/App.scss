@@ -37,6 +37,17 @@ body {
   color: var(--ink);
   background: var(--paper);
   -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.devtools-open body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #120e0c;
 }
 
 button,
@@ -115,8 +126,16 @@ img {
     line-height: 1;
     color: #fff;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.35rem;
+  }
+
+  &__logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    flex-shrink: 0;
+    pointer-events: none;
   }
 
   &__brand-amp {
@@ -241,6 +260,15 @@ img {
     span {
       display: block;
     }
+  }
+
+  &__logo {
+    width: clamp(3.2rem, 12vw, 4.5rem);
+    height: clamp(3.2rem, 12vw, 4.5rem);
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
   }
 
   &__brand-line {
@@ -1012,6 +1040,14 @@ img {
     font-family: var(--font-display);
     font-size: 2rem;
     letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+
+    img {
+      border-radius: 9px;
+      pointer-events: none;
+    }
   }
 
   a {

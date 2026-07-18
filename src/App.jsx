@@ -42,7 +42,13 @@ function ItemPrice({ item }) {
 
 function DietDot({ type }) {
   const label =
-    type === "veg" ? "Veg" : type === "egg" ? "Egg" : type === "non-veg" ? "Non-veg" : "";
+    type === "veg"
+      ? "Veg"
+      : type === "egg"
+        ? "Egg"
+        : type === "non-veg"
+          ? "Non-veg"
+          : "";
   if (!label) return null;
   return (
     <span className={`diet diet--${type}`} title={label} aria-label={label}>
@@ -108,7 +114,7 @@ const App = () => {
         ([entry]) => {
           if (entry.isIntersecting) setActiveSection(section.id);
         },
-        { rootMargin: "-35% 0px -55% 0px", threshold: 0 }
+        { rootMargin: "-35% 0px -55% 0px", threshold: 0 },
       );
       obs.observe(el);
       observers.push(obs);
@@ -122,7 +128,10 @@ const App = () => {
 
   const scrollToSection = (id) => {
     setMobileNavOpen(false);
-    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    sectionRefs.current[id]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
 
   const callHref = `tel:${restaurant.phone}`;
@@ -150,7 +159,11 @@ const App = () => {
             <span className="chrome__brand-spyyce">Spyyce</span>
           </p>
 
-          <a className="chrome__call" href={callHref} aria-label="Call restaurant">
+          <a
+            className="chrome__call"
+            href={callHref}
+            aria-label="Call restaurant"
+          >
             <PhoneCall01 />
             <span className="only-desk">Call</span>
           </a>
@@ -176,11 +189,15 @@ const App = () => {
             Catering that hits every occasion.
           </h1>
           <p className="hero__support animate-rise delay-2">
-            Indian &amp; Chinese · Bulk orders for birthdays, kiti-parties, society
-            functions &amp; more.
+            Indian &amp; Chinese · Bulk orders for birthdays, kiti-parties,
+            society functions &amp; more.
           </p>
           <div className="hero__cta animate-rise delay-3">
-            <button type="button" className="btn btn--primary" onClick={scrollToMenu}>
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={scrollToMenu}
+            >
               View menu
               <ChevronRight />
             </button>
@@ -237,7 +254,9 @@ const App = () => {
                   className={`diet-filters__chip ${dietFilter === f.id ? "is-active" : ""} diet-filters__chip--${f.id}`}
                   onClick={() => setDietFilter(f.id)}
                 >
-                  {f.id !== "all" && <DietDot type={f.id === "non-veg" ? "non-veg" : "veg"} />}
+                  {f.id !== "all" && (
+                    <DietDot type={f.id === "non-veg" ? "non-veg" : "veg"} />
+                  )}
                   {f.label}
                 </button>
               ))}
@@ -294,7 +313,11 @@ const App = () => {
                 ))}
               </div>
 
-              <div className="section-chips" role="tablist" aria-label="Sections">
+              <div
+                className="section-chips"
+                role="tablist"
+                aria-label="Sections"
+              >
                 {filteredSections.map((section) => (
                   <button
                     key={section.id}
@@ -304,7 +327,9 @@ const App = () => {
                     className={`section-chips__chip ${activeSection === section.id ? "is-active" : ""}`}
                     onClick={() => scrollToSection(section.id)}
                   >
-                    {section.name.replace(/ IN (INDIAN|CHINESE)/i, "").replace(/ INDIAN| CHINESE/i, "")}
+                    {section.name
+                      .replace(/ IN (INDIAN|CHINESE)/i, "")
+                      .replace(/ INDIAN| CHINESE/i, "")}
                   </button>
                 ))}
               </div>
@@ -315,7 +340,8 @@ const App = () => {
               <div>
                 <h2 className="menu__title">{activeMenu.title} menu</h2>
                 <p className="menu__count">
-                  {filteredSections.reduce((n, s) => n + s.items.length, 0)} dishes
+                  {filteredSections.reduce((n, s) => n + s.items.length, 0)}{" "}
+                  dishes
                 </p>
               </div>
               <div className="view-toggle" role="group" aria-label="Layout">
@@ -354,7 +380,9 @@ const App = () => {
                       <span className={`type-badge type--${section.type}`} />
                       {section.name}
                     </h3>
-                    <span className="menu-section__count">{section.items.length}</span>
+                    <span className="menu-section__count">
+                      {section.items.length}
+                    </span>
                   </header>
 
                   <ul className="item-list">
@@ -401,7 +429,6 @@ const App = () => {
       </main>
 
       <footer className="footer">
-        <p className="footer__brand">Red Chilli &amp; Spyyce</p>
         <a href={callHref}>
           <PhoneCall01 /> {restaurant.phone}
         </a>
@@ -424,7 +451,11 @@ const App = () => {
         <div className="drawer__panel" role="dialog" aria-label="Sections">
           <div className="drawer__head">
             <p>Jump to</p>
-            <button type="button" onClick={() => setMobileNavOpen(false)} aria-label="Close">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(false)}
+              aria-label="Close"
+            >
               <XClose />
             </button>
           </div>
