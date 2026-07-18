@@ -1,0 +1,330 @@
+{
+  "restaurant": {
+    "name": "RED CHILLI & SPYYCE FOOD SERVICES",
+    "tagline": "Specialist in Catering Bulk Orders for all Occasion (Birthday, Kiti-Party, Society Function, Pooja, House Warming)",
+    "phone": "9819958246",
+    "address": "SAI WORLD CITY, Shop No. 23, Opp. to Marathon Society, Palaspe, Panvel.",
+    "currency": "INR"
+  },
+  "menus": {
+    "indian": {
+      "title": "Indian",
+      "sections": [
+        {
+          "id": "veg-starter-indian",
+          "name": "VEG STARTER INDIAN",
+          "type": "veg",
+          "items": [
+            { "name": "Paneer Tikka", "price": 349 },
+            { "name": "Malai Paneer Tikka", "price": 349 },
+            { "name": "Pahadi Paneer Tikka", "price": 349 },
+            { "name": "Hara Bhara Kabab", "price": 249 },
+            { "name": "Veg Cutlet", "price": 249 },
+            { "name": "Tandoori Aloo", "price": 259 }
+          ]
+        },
+        {
+          "id": "veg-main-course",
+          "name": "VEG MAIN COURSE",
+          "type": "veg",
+          "items": [
+            { "name": "Palak Paneer", "price": 299 },
+            { "name": "Shahi Paneer", "price": 299 },
+            { "name": "Malai Kofta", "price": 315 },
+            { "name": "Mix Veg Tawa", "price": 299 },
+            { "name": "Mix Veg Kolhapuri", "price": 299 },
+            { "name": "Veg Jalfreji", "price": 299 },
+            { "name": "Kaju Masala", "price": 349 }
+          ]
+        },
+        {
+          "id": "veg-rice-indian",
+          "name": "VEG RICE IN INDIAN",
+          "type": "veg",
+          "items": [
+            { "name": "Veg Biriyani", "priceHalf": 175, "priceFull": 300 },
+            { "name": "Paneer Biriyani", "priceHalf": 199, "priceFull": 349 },
+            { "name": "Veg Pulao", "price": 299 },
+            { "name": "Lasuni Dal Khichadi", "price": 249 },
+            { "name": "Jeera Rice", "price": 119 },
+            { "name": "Steam Rice", "price": 110 }
+          ]
+        },
+        {
+          "id": "dal-indian",
+          "name": "DAL IN INDIAN",
+          "type": "veg",
+          "items": [
+            { "name": "Dal Makhni", "price": 249 },
+            { "name": "Dal Fry", "price": 215 },
+            { "name": "Dal Tadka", "price": 215 },
+            { "name": "Rajma", "price": 215 }
+          ]
+        },
+        {
+          "id": "roti",
+          "name": "ROTI",
+          "type": "veg",
+          "items": [
+            { "name": "Tandoori Roti", "price": 30 },
+            { "name": "Butter Tandoori Roti", "price": 39 },
+            { "name": "Butter Naan", "price": 49 },
+            { "name": "Garlic Naan", "price": 59 },
+            { "name": "Cheese Garlic Naan", "price": 90 },
+            { "name": "Stuff Kulcha", "price": 79 },
+            { "name": "Lacha Paratha", "price": 59 }
+          ]
+        },
+        {
+          "id": "sweet-deserts",
+          "name": "SWEET DESERTS",
+          "type": "veg",
+          "items": [
+            { "name": "Gulab Jamun 2pc", "price": 50 },
+            { "name": "Besan Halwa", "price": 199 },
+            { "name": "Dahi vada", "price": 100 },
+            { "name": "Malpua with Rabdi", "price": 149 },
+            { "name": "Fried Ice-Cream", "price": 199 }
+          ]
+        },
+        {
+          "id": "beverages",
+          "name": "BEVERAGES",
+          "type": "veg",
+          "items": [
+            { "name": "Sweet Lassi", "price": 80 },
+            { "name": "Banana Milkshake", "price": 120 },
+            { "name": "Chaas Tak", "price": 30 },
+            { "name": "Tea", "price": 20 },
+            { "name": "Coffee", "price": 25 },
+            { "name": "Black coffee", "price": 20 },
+            { "name": "Green Tea", "price": 45 }
+          ]
+        },
+        {
+          "id": "non-veg-tandoor-starter-indian",
+          "name": "NON-VEG TANDOOR STARTER INDIAN",
+          "type": "non-veg",
+          "items": [
+            { "name": "Chicken Tandoori", "priceHalf": 349, "priceFull": 599 },
+            { "name": "Chicken Tandoori Tikka", "price": 349 },
+            { "name": "Chicken Malai Tikka", "price": 349 },
+            { "name": "Chicken Banjara Kabab", "price": 349 },
+            { "name": "Chicken Pahadi Kabab", "price": 349 }
+          ]
+        },
+        {
+          "id": "non-veg-main-course-indian",
+          "name": "NON-VEG MAIN COURSE INDIAN",
+          "type": "non-veg",
+          "items": [
+            { "name": "Butter Chicken", "priceHalf": 349, "priceFull": 549 },
+            { "name": "Chicken Tikka Masala", "price": 349 },
+            { "name": "Chicken Do Pyaja", "price": 349 },
+            { "name": "Chicken Handi", "price": 349 },
+            { "name": "Chicken Bhuna", "price": 349 },
+            { "name": "Chicken Palak", "price": 349 },
+            { "name": "Prawns Curry", "price": 399 },
+            { "name": "Mutton Rogan Josh", "price": 450 }
+          ]
+        },
+        {
+          "id": "non-veg-rice-indian",
+          "name": "NON-VEG RICE IN INDIAN",
+          "type": "non-veg",
+          "items": [
+            { "name": "Chicken Dum Biriyani", "priceHalf": 199, "priceFull": 349 },
+            { "name": "Chicken Tikka Biriyani", "priceHalf": 249, "priceFull": 399 },
+            { "name": "Chicken Pulao", "priceHalf": 199, "priceFull": 349 }
+          ]
+        },
+        {
+          "id": "snacks",
+          "name": "SNACKS",
+          "type": "mixed",
+          "items": [
+            { "name": "French Fries", "price": 80, "type": "veg" },
+            { "name": "Spring Roll", "price": 120, "type": "veg" },
+            { "name": "Veg Momos (steam)", "price": 90, "type": "veg" },
+            { "name": "Chicken Momos (steam)", "price": 120, "type": "non-veg" },
+            { "name": "Poha", "price": 40, "type": "veg" },
+            { "name": "Paneer Paratha", "price": 120, "type": "veg" },
+            { "name": "Aloo Paratha", "price": 80, "type": "veg" },
+            { "name": "Chole Bhature", "price": 149, "type": "veg" },
+            { "name": "Puri Bhaji", "price": 149, "type": "veg" },
+            { "name": "Chole Pattice", "price": 149, "type": "veg" },
+            { "name": "Pav Bhaji", "price": 130, "type": "veg" },
+            { "name": "Egg Bhurjee Pav", "price": 130, "type": "egg" },
+            { "name": "Chicken Keema Pav", "price": 199, "type": "non-veg" },
+            { "name": "Extra Pav", "price": 15, "type": "veg" },
+            { "name": "Extra Bhatura", "price": 40, "type": "veg" },
+            { "name": "Extra Puri", "price": 30, "type": "veg" }
+          ]
+        },
+        {
+          "id": "combo-veg-non-veg",
+          "name": "COMBO VEG / NON-VEG",
+          "type": "mixed",
+          "items": [
+            {
+              "name": "Combo 1",
+              "type": "veg",
+              "price": 149,
+              "description": "Jeera Rice Or Roti 2 units with any one option from Rajma / Dal Makhni / Dal Tadka / Chole",
+              "baseOptions": ["Jeera Rice", "Roti 2 units"],
+              "curryOptions": ["Rajma", "Dal Makhni", "Dal Tadka", "Chole"]
+            },
+            {
+              "name": "Combo 2",
+              "type": "non-veg",
+              "price": 199,
+              "description": "Jeera Rice Or Roti 2 units with any one option from Butter Chicken / Chicken Handi / Chicken Bhuna",
+              "baseOptions": ["Jeera Rice", "Roti 2 units"],
+              "curryOptions": ["Butter Chicken", "Chicken Handi", "Chicken Bhuna"]
+            }
+          ]
+        }
+      ]
+    },
+    "chinese": {
+      "title": "Chinese",
+      "sections": [
+        {
+          "id": "veg-soups-chinese",
+          "name": "VEG SOUPS IN CHINESE",
+          "type": "veg",
+          "items": [
+            { "name": "Sweet Corn Soup", "price": 139 },
+            { "name": "Manchow Soup", "price": 139 },
+            { "name": "Tomato Soup", "price": 139 },
+            { "name": "Cream Of Mashroom soup", "price": 149 },
+            { "name": "Khow Suey Soup", "price": 180 },
+            { "name": "Tomyum Veg Soup", "price": 180 }
+          ]
+        },
+        {
+          "id": "veg-starter-chinese",
+          "name": "VEG STARTER IN CHINESE",
+          "type": "veg",
+          "items": [
+            { "name": "Stir Fry Veg", "price": 249 },
+            { "name": "Veg Manchurian", "price": 249 },
+            { "name": "Paneer Chilli", "price": 299 },
+            { "name": "White Flower Pataya", "price": 249 },
+            { "name": "Crispy American Corn", "price": 269 },
+            { "name": "Veg Crispy", "price": 249 },
+            { "name": "Baby Corn Mashroom hunan", "price": 249 },
+            { "name": "Cilantro Paneer", "price": 299 },
+            { "name": "Lotus Honey Chilli", "price": 349 }
+          ]
+        },
+        {
+          "id": "veg-main-course-chinese",
+          "name": "VEG MAIN COURSE IN CHINESE",
+          "type": "veg",
+          "items": [
+            { "name": "Veg Thai Green Curry", "price": 349 },
+            { "name": "Veg Thai Red Curry", "price": 349 },
+            { "name": "Veg Panel Curry", "price": 349 },
+            { "name": "Burmish Khawshey", "price": 299 },
+            { "name": "Paneer Chilli Gravy", "price": 299 },
+            { "name": "Veg Manchurian Gravy", "price": 269 }
+          ]
+        },
+        {
+          "id": "veg-rice-chinese",
+          "name": "VEG RICE IN CHINESE",
+          "type": "veg",
+          "items": [
+            { "name": "Veg Fried Rice", "price": 225 },
+            { "name": "Veg Burn Garlic Rice", "price": 225 },
+            { "name": "Veg Sezwan Rice", "price": 225 },
+            { "name": "Veg Triple Sezwan Rice", "price": 299 },
+            { "name": "Veg Blue Rice", "price": 399 }
+          ]
+        },
+        {
+          "id": "veg-noodles-chinese",
+          "name": "VEG NOODLES IN CHINESE",
+          "type": "veg",
+          "items": [
+            { "name": "Veg Hakka Noodles", "price": 225 },
+            { "name": "Veg Sezwan Noodles", "price": 225 },
+            { "name": "Veg Chilli Garlic Noodles", "price": 225 },
+            { "name": "Veg Chowmine", "price": 249 },
+            { "name": "Veg Spyyce Ramen", "price": 249 }
+          ]
+        },
+        {
+          "id": "non-veg-soups-chinese",
+          "name": "NON-VEG SOUPS IN CHINESE",
+          "type": "non-veg",
+          "items": [
+            { "name": "Chicken Sweet corn Soup", "price": 149 },
+            { "name": "Chicken Manchow Soup", "price": 149 },
+            { "name": "Chicken Lemon Raymon Soup", "price": 199 },
+            { "name": "Cream Of Chicken Soup", "price": 199 },
+            { "name": "Chicken Khawshey Soup", "price": 199 },
+            { "name": "Mutton Paya Shorba", "price": 249 },
+            { "name": "Chicken Tomyum Soup", "price": 199 }
+          ]
+        },
+        {
+          "id": "non-veg-starter-chinese",
+          "name": "NON-VEG STARTER IN CHINESE",
+          "type": "non-veg",
+          "items": [
+            { "name": "Stir Fry Chicken", "price": 299 },
+            { "name": "Chicken Manchurian", "price": 299 },
+            { "name": "Crispy Chicken", "price": 299 },
+            { "name": "Chicken hunan", "price": 299 },
+            { "name": "Chicken Cilantro", "price": 299 },
+            { "name": "Cumpao Chicken", "price": 315 },
+            { "name": "Mangrlian Chicken", "price": 315 },
+            { "name": "Chicken Lolypop", "price": 349 },
+            { "name": "Chicken Honey Chilli", "price": 299 },
+            { "name": "Prawns Chilli", "price": 349 }
+          ]
+        },
+        {
+          "id": "non-veg-main-course-chinese",
+          "name": "NON-VEG MAIN COURSE IN CHINESE",
+          "type": "non-veg",
+          "items": [
+            { "name": "Chicken Thai Curry Green", "price": 399 },
+            { "name": "Chicken Thai Curry Red", "price": 399 },
+            { "name": "Chicken Panel Curry", "price": 399 },
+            { "name": "Chicken Burmish Khausey", "price": 349 },
+            { "name": "Chicken Chilli Gravy", "price": 349 },
+            { "name": "Chicken Manchurian", "price": 349 }
+          ]
+        },
+        {
+          "id": "non-veg-rice-chinese",
+          "name": "NON-VEG RICE IN CHINESE",
+          "type": "non-veg",
+          "items": [
+            { "name": "Chicken Fried Rice", "price": 299 },
+            { "name": "Chicken Burn Garlic Rice", "price": 299 },
+            { "name": "Chicken Sezwan Rice", "price": 299 },
+            { "name": "Chicken Triple Sezwan Rice", "price": 349 },
+            { "name": "Chicken Blue Rice", "price": 399 }
+          ]
+        },
+        {
+          "id": "non-veg-noodles-chinese",
+          "name": "NON-VEG NOODLES IN CHINESE",
+          "type": "non-veg",
+          "items": [
+            { "name": "Chicken Hakka Noodles", "price": 249 },
+            { "name": "Chicken Sezwan Noodles", "price": 259 },
+            { "name": "Chicken Chilli Burn Garlic Noodles", "price": 249 },
+            { "name": "Chicken Chowmine", "price": 249 },
+            { "name": "Chicken Spyyce Ramen Noodles", "price": 249 },
+            { "name": "Chicken Burmise Khaushe", "price": 319 }
+          ]
+        }
+      ]
+    }
+  }
+}
