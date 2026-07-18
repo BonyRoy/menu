@@ -70,8 +70,26 @@ const App = () => {
   const [heroGone, setHeroGone] = useState(false);
   const menuRef = useRef(null);
   const sectionRefs = useRef({});
+  const chromeRef = useRef(null);
+  const controlsRef = useRef(null);
 
   const activeMenu = menus[cuisine];
+
+  const getStickyOffset = () => {
+    const chromeH = chromeRef.current?.offsetHeight ?? 56;
+    const controls = controlsRef.current;
+    const controlsVisible =
+      controls && window.getComputedStyle(controls).display !== "none";
+    const controlsH = controlsVisible ? controls.offsetHeight : 0;
+    return chromeH + controlsH + 12;
+  };
+
+  const syncScrollMargin = () => {
+    document.documentElement.style.setProperty(
+      "--scroll-offset",
+      `${getStickyOffset()}px`
+    );
+  };
 
   const filteredSections = useMemo(() => {
     return activeMenu.sections
@@ -106,15 +124,32 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    syncScrollMargin();
+    const onResize = () => syncScrollMargin();
+    window.addEventListener("resize", onResize);
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(syncScrollMargin)
+        : null;
+    if (controlsRef.current) ro?.observe(controlsRef.current);
+    if (chromeRef.current) ro?.observe(chromeRef.current);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      ro?.disconnect();
+    };
+  }, [cuisine, dietFilter, filteredSections]);
+
+  useEffect(() => {
     const observers = [];
     filteredSections.forEach((section) => {
       const el = sectionRefs.current[section.id];
       if (!el) return;
+      const top = getStickyOffset();
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) setActiveSection(section.id);
         },
-        { rootMargin: "-35% 0px -55% 0px", threshold: 0 },
+        { rootMargin: `-${top + 8}px 0px -55% 0px`, threshold: 0 }
       );
       obs.observe(el);
       observers.push(obs);
@@ -128,9 +163,14 @@ const App = () => {
 
   const scrollToSection = (id) => {
     setMobileNavOpen(false);
-    sectionRefs.current[id]?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+    const el = sectionRefs.current[id];
+    if (!el) return;
+    // Wait a tick so drawer close / layout settle, then measure sticky stack
+    requestAnimationFrame(() => {
+      syncScrollMargin();
+      const offset = getStickyOffset();
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
     });
   };
 
@@ -142,7 +182,10 @@ const App = () => {
       <div className="grain" aria-hidden="true" />
 
       {/* —— Sticky chrome —— */}
-      <header className={`chrome ${heroGone ? "chrome--solid" : ""}`}>
+      <header
+        ref={chromeRef}
+        className={`chrome ${heroGone ? "chrome--solid" : ""}`}
+      >
         <div className="chrome__inner">
           <button
             type="button"
@@ -279,7 +322,7 @@ const App = () => {
 
           <div className="menu__main">
             {/* Phone: sticky controls */}
-            <div className="menu__controls only-phone">
+            <div className="menu__controls only-phone" ref={controlsRef}>
               <div className="cuisine cuisine--pills">
                 {Object.entries(menus).map(([key, value]) => (
                   <button
