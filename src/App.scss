@@ -661,6 +661,8 @@ img {
   padding-bottom: 0.15rem;
   scrollbar-width: none;
   margin: 0 -0.15rem;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
     display: none;

@@ -72,6 +72,10 @@ const App = () => {
   const sectionRefs = useRef({});
   const chromeRef = useRef(null);
   const controlsRef = useRef(null);
+  const chipsRef = useRef(null);
+  const chipRefs = useRef({});
+  const sectionNavRef = useRef(null);
+  const sectionNavLinkRefs = useRef({});
 
   const activeMenu = menus[cuisine];
 
@@ -156,6 +160,27 @@ const App = () => {
     });
     return () => observers.forEach((o) => o.disconnect());
   }, [filteredSections]);
+
+  // Keep active section chip / sidebar link in view while scrolling the menu
+  useEffect(() => {
+    if (!activeSection) return;
+
+    const container = chipsRef.current;
+    const chip = chipRefs.current[activeSection];
+    if (container && chip) {
+      const left =
+        chip.offsetLeft - container.clientWidth / 2 + chip.offsetWidth / 2;
+      container.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+    }
+
+    const nav = sectionNavRef.current;
+    const navLink = sectionNavLinkRefs.current[activeSection];
+    if (nav && navLink) {
+      const top =
+        navLink.offsetTop - nav.clientHeight / 2 + navLink.offsetHeight / 2;
+      nav.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
+  }, [activeSection]);
 
   const scrollToMenu = () => {
     const el = menuRef.current;
@@ -311,11 +336,18 @@ const App = () => {
               ))}
             </div>
 
-            <nav className="section-nav" aria-label="Menu sections">
+            <nav
+              className="section-nav"
+              aria-label="Menu sections"
+              ref={sectionNavRef}
+            >
               {filteredSections.map((section) => (
                 <button
                   key={section.id}
                   type="button"
+                  ref={(el) => {
+                    sectionNavLinkRefs.current[section.id] = el;
+                  }}
                   className={`section-nav__link ${activeSection === section.id ? "is-active" : ""}`}
                   onClick={() => scrollToSection(section.id)}
                 >
@@ -366,12 +398,16 @@ const App = () => {
                 className="section-chips"
                 role="tablist"
                 aria-label="Sections"
+                ref={chipsRef}
               >
                 {filteredSections.map((section) => (
                   <button
                     key={section.id}
                     type="button"
                     role="tab"
+                    ref={(el) => {
+                      chipRefs.current[section.id] = el;
+                    }}
                     aria-selected={activeSection === section.id}
                     className={`section-chips__chip ${activeSection === section.id ? "is-active" : ""}`}
                     onClick={() => scrollToSection(section.id)}
