@@ -158,7 +158,13 @@ const App = () => {
   }, [filteredSections]);
 
   const scrollToMenu = () => {
-    menuRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = menuRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      const chromeH = chromeRef.current?.offsetHeight ?? 56;
+      const top = el.getBoundingClientRect().top + window.scrollY - chromeH - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    });
   };
 
   const scrollToSection = (id) => {
