@@ -1,16 +1,74 @@
-# React + Vite
+# MenuCraft — Multi-tenant Restaurant Menu Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A responsive React app where restaurants sign up, fill in their menu data, upload a logo and hero image, and share a public menu page via UUID.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Auth** — Email/password sign up & sign in (Supabase Auth)
+- **Dashboard** — Create and manage multiple restaurants
+- **Restaurant form** — Name, tagline, phone, address, logo, hero image, menu JSON
+- **Public menu** — `/menu/:uuid` renders that restaurant's menu (mobile-first, filters, section nav)
+- **Storage** — Logo & hero images stored in Supabase Storage
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Create a Supabase project
 
-## Expanding the Oxlint configuration
+1. Go to [supabase.com](https://supabase.com) and create a project
+2. In **SQL Editor**, run the contents of `supabase/schema.sql`
+3. In **Authentication → Providers**, enable Email (disable "Confirm email" for faster local testing if you prefer)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### 2. Environment variables
+
+Copy `.env.example` to `.env` and fill in your project credentials from **Project Settings → API**:
+
+```bash
+cp .env.example .env
+```
+
+```
+VITE_SUPABASE_URL=https://xxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### 3. Install & run
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`
+
+## Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/signup` | Create account |
+| `/login` | Sign in |
+| `/dashboard` | Manage restaurants (protected) |
+| `/dashboard/new` | Create restaurant + menu (protected) |
+| `/dashboard/edit/:id` | Edit restaurant (protected) |
+| `/menu/:uuid` | Public menu page |
+
+## Menu data format
+
+The form accepts the `menus` object from `src/data/menu.json`. Click **Load sample template** to pre-fill the full Indian + Chinese menu.
+
+Each restaurant gets a UUID on creation. Share:
+
+```
+https://yoursite.com/menu/<uuid>
+```
+
+## Deploy notes
+
+For client-side routing (`/menu/:uuid`), configure your host to serve `index.html` for all paths (SPA fallback). On Vite preview / most static hosts, add a `_redirects` or `vercel.json` rewrite as needed.
+
+## Tech stack
+
+- React 19 + Vite
+- React Router
+- Supabase (Auth, Postgres, Storage)
+- Sass

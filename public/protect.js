@@ -1,4 +1,15 @@
 (() => {
+  const isLocalDev =
+    location.hostname === "localhost" ||
+    location.hostname === "127.0.0.1" ||
+    location.hostname === "[::1]";
+
+  // Skip all protections during local development (DevTools overlay caused a black screen)
+  if (isLocalDev) {
+    document.documentElement.classList.remove("devtools-open");
+    return;
+  }
+
   const block = (e) => {
     e.preventDefault();
     return false;
@@ -18,7 +29,6 @@
       const ctrl = e.ctrlKey || e.metaKey;
       const shift = e.shiftKey;
 
-      // DevTools / view source / save / print / select-all / copy / cut / paste
       if (
         key === "f12" ||
         (ctrl && shift && ["i", "j", "c", "k", "u"].includes(key)) ||
@@ -33,7 +43,6 @@
     { capture: true }
   );
 
-  // Light DevTools-open deterrent (desktop only; not foolproof)
   const threshold = 160;
   setInterval(() => {
     if (window.innerWidth < 900) {
