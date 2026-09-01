@@ -66,6 +66,19 @@ https://yoursite.com/menu/<uuid>
 
 For client-side routing (`/menu/:uuid`), configure your host to serve `index.html` for all paths (SPA fallback). On Vite preview / most static hosts, add a `_redirects` or `vercel.json` rewrite as needed.
 
+### Vercel environment variables
+
+Your local `.env` file is **not** uploaded to Vercel. Vite reads `VITE_*` variables at **build time**, so you must set them in the Vercel dashboard before deploying:
+
+1. Open your project on [vercel.com](https://vercel.com) → **Settings → Environment Variables**
+2. Add both variables (same values as your local `.env`):
+   - `VITE_SUPABASE_URL` — e.g. `https://xxxx.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` — your anon / publishable key from Supabase **Settings → API**
+3. Enable them for **Production**, **Preview**, and **Development**
+4. **Redeploy** the project (Deployments → ⋯ → Redeploy) so the build picks up the new values
+
+Without a redeploy after adding env vars, the live site will still show "Supabase is not configured."
+
 ## Tech stack
 
 - React 19 + Vite

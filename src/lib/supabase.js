@@ -6,8 +6,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || "";
 export const isSupabaseConfigured =
   supabaseUrl.length > 0 && supabaseAnonKey.length > 0;
 
-export const SUPABASE_CONFIG_ERROR =
-  "Supabase is not configured. Copy .env.example to .env and set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from your Supabase project (Settings → API).";
+export const SUPABASE_CONFIG_ERROR = import.meta.env.PROD
+  ? "Supabase is not configured on Vercel. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY under Project Settings → Environment Variables, then redeploy."
+  : "Supabase is not configured. Copy .env.example to .env and set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from your Supabase project (Settings → API).";
 
 if (!isSupabaseConfigured && import.meta.env.DEV) {
   console.error(`[MenuCraft] ${SUPABASE_CONFIG_ERROR}`);
