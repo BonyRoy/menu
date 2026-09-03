@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const [signingOut, setSigningOut] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [togglingId, setTogglingId] = useState(null);
   const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function DashboardPage() {
       setLoading(true);
       const { data, error } = await requireSupabase()
         .from("restaurants")
-        .select("id, name, phone, logo_url, created_at, updated_at")
+        .select("id, name, phone, logo_url, created_at, updated_at, is_online")
         .eq("user_id", user.id)
         .order("updated_at", { ascending: false });
 
@@ -58,6 +59,27 @@ export default function DashboardPage() {
     setSignOutConfirmOpen(false);
     toast.success("Signed out");
     navigate("/");
+  };
+
+  const toggleOnline = async (restaurant) => {
+    const next = restaurant.is_online === false;
+    setTogglingId(restaurant.id);
+    const { error } = await requireSupabase()
+      .from("restaurants")
+      .update({ is_online: next })
+      .eq("id", restaurant.id)
+      .eq("user_id", user.id);
+    setTogglingId(null);
+
+    if (error) {
+      toast.error(error.message || "Could not update menu visibility");
+      return;
+    }
+
+    setRestaurants((prev) =>
+      prev.map((item) => (item.id === restaurant.id ? { ...item, is_online: next } : item)),
+    );
+    toast.success(next ? "Menu is online" : "Menu is offline");
   };
 
   const copyMenuLink = async (id) => {
@@ -154,6 +176,9 @@ export default function DashboardPage() {
                       <h2>{r.name}</h2>
                       <p className="auth-muted">{r.phone}</p>
                       <code className="restaurant-card__uuid">{r.id}</code>
+                      <span className={`menu-status ${r.is_online === false ? "is-off" : "is-on"}`}>
+                        {r.is_online === false ? "Offline" : "Online"}
+                      </span>
                     </div>
                   </div>
                   <MenuQrCode restaurantId={r.id} restaurantName={r.name} />
@@ -174,6 +199,18 @@ export default function DashboardPage() {
                   >
                     <Copy01 />
                     Copy link
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--sm restaurant-card__btn"
+                    onClick={() => toggleOnline(r)}
+                    disabled={togglingId === r.id}
+                  >
+                    {togglingId === r.id
+                      ? "Updating…"
+                      : r.is_online === false
+                        ? "Go online"
+                        : "Go offline"}
                   </button>
                   <button
                     type="button"

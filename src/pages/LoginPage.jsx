@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowLeft } from "@untitledui/icons";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
@@ -30,13 +31,22 @@ export default function LoginPage() {
         <h1>Get started</h1>
         <p className="auth-muted">Continue with Google to manage your restaurant menu.</p>
 
-        <div className="auth-form">
+        <div className="auth-actions">
+          <Link to="/" className="btn btn--ghost auth-back-btn" aria-label="Go back">
+            <ArrowLeft />
+          </Link>
           <button
             type="button"
-            className="btn btn--ghost auth-submit"
+            className="btn auth-google-btn auth-submit"
             disabled={loading}
             onClick={handleGoogleSignIn}
           >
+            <img
+              src="/google-g.svg"
+              alt=""
+              aria-hidden="true"
+              className="auth-google-btn__icon"
+            />
             <SpinnerButton loading={loading}>
               {loading ? "Redirecting…" : "Continue with Google"}
             </SpinnerButton>

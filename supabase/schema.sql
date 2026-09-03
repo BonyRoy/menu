@@ -13,6 +13,7 @@ create table if not exists public.restaurants (
   hero_image_url text,
   menu_data jsonb not null default '{}'::jsonb,
   theme jsonb default '{"id":"classic-chilli"}'::jsonb,
+  is_online boolean not null default true,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );

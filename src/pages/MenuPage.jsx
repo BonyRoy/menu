@@ -7,6 +7,10 @@ import Spinner from "../components/Spinner";
 import "../App.scss";
 import "../styles/platform.scss";
 
+function isMenuOnline(value) {
+  return value !== false && value !== "false" && value !== 0;
+}
+
 export default function MenuPage() {
   const { uuid } = useParams();
   const [loading, setLoading] = useState(true);
@@ -21,18 +25,40 @@ export default function MenuPage() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await requireSupabase()
-        .from("restaurants")
-        .select("*")
-        .eq("id", uuid)
-        .single();
+      const client = requireSupabase();
+      const publicMenu = await client.rpc("get_public_menu", { menu_id: uuid });
+      let data = Array.isArray(publicMenu.data) ? publicMenu.data[0] : publicMenu.data;
+
+      if (!publicMenu.error && !data) {
+        setError("This menu is currently offline.");
+        setLoading(false);
+        return;
+      }
+
+      if (publicMenu.error) {
+        const fallback = await client
+          .from("restaurants")
+          .select("*")
+          .eq("id", uuid)
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (fallback.error || !fallback.data) {
+          const message = "Restaurant not found. Check the menu link and try again.";
+          setError(message);
+          toast.error(message);
+          setLoading(false);
+          return;
+        }
+
+        data = fallback.data;
+      }
 
       if (cancelled) return;
 
-      if (fetchError || !data) {
-        const message = "Restaurant not found. Check the menu link and try again.";
-        setError(message);
-        toast.error(message);
+      if (!isMenuOnline(data.is_online)) {
+        setError("This menu is currently offline.");
         setLoading(false);
         return;
       }

@@ -8,6 +8,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import RestaurantFormPage from "./pages/RestaurantFormPage";
 import MenuPage from "./pages/MenuPage";
+import AdminPage from "./pages/AdminPage";
 import "./styles/platform.scss";
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
             }
           />
           <Route path="/menu/:uuid" element={<MenuPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </BrowserRouter>
 
