@@ -207,7 +207,7 @@ export default function DashboardPage() {
                       onClick={() => goOffline(r)}
                       disabled={togglingId === r.id}
                     >
-                      {togglingId === r.id ? "Updating…" : "Go offline"}
+                      {togglingId === r.id ? "Updating…" : "Disable"}
                     </button>
                   )}
                   <button

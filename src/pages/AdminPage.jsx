@@ -282,8 +282,8 @@ export default function AdminPage() {
                             {togglingId === menu.id
                               ? "Updating…"
                               : menu.is_online === false
-                                ? "Go online"
-                                : "Go offline"}
+                                ? "Enable"
+                                : "Disable"}
                           </button>
                           <button
                             type="button"
