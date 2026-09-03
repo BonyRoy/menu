@@ -35,14 +35,14 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = (email, password) => {
+  const signInWithGoogle = () => {
     if (!supabase) return Promise.resolve(configErrorResult());
-    return supabase.auth.signUp({ email, password });
-  };
-
-  const signIn = (email, password) => {
-    if (!supabase) return Promise.resolve(configErrorResult());
-    return supabase.auth.signInWithPassword({ email, password });
+    return supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
   };
 
   const signOut = () => {
@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );

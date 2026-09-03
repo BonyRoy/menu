@@ -12,10 +12,7 @@ export default function LandingPage() {
           MenuCraft
         </Link>
         <nav className="platform-nav__links">
-          <Link to="/login" className="platform-nav__link">
-            Sign in
-          </Link>
-          <Link to="/signup" className="btn btn--primary platform-nav__cta">
+          <Link to="/auth" className="btn btn--primary platform-nav__cta">
             Get started
           </Link>
         </nav>
@@ -34,16 +31,14 @@ export default function LandingPage() {
             Share it with one link.
           </h1>
           <p className="platform-hero__sub">
-            Sign up, fill in your restaurant details and menu, upload your logo
-            and hero image — then share your unique menu URL with customers.
+            Continue with Google, fill in your restaurant details and menu,
+            upload your logo and hero image, then share your unique menu URL
+            with customers.
           </p>
           <div className="platform-hero__actions">
-            <Link to="/signup" className="btn btn--primary">
-              Create free account
+            <Link to="/auth" className="btn btn--primary">
+              Continue with Google
               <ChevronRight />
-            </Link>
-            <Link to="/login" className="btn btn--ghost">
-              I already have an account
             </Link>
           </div>
         </div>

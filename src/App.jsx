@@ -1,11 +1,10 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
 import DashboardPage from "./pages/DashboardPage";
 import RestaurantFormPage from "./pages/RestaurantFormPage";
 import MenuPage from "./pages/MenuPage";
@@ -17,8 +16,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/auth" element={<LoginPage />} />
+          <Route path="/login" element={<Navigate to="/auth" replace />} />
+          <Route path="/signup" element={<Navigate to="/auth" replace />} />
           <Route
             path="/dashboard"
             element={
