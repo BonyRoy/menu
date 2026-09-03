@@ -110,10 +110,10 @@ export default function AdminPage() {
   const toggleOnline = async (menu) => {
     const next = menu.is_online === false;
     setTogglingId(menu.id);
-    const { error } = await requireSupabase()
-      .from("restaurants")
-      .update({ is_online: next })
-      .eq("id", menu.id);
+    const { error } = await requireSupabase().rpc("admin_set_menu_online", {
+      menu_id: menu.id,
+      next_online: next,
+    });
     setTogglingId(null);
 
     if (error) {

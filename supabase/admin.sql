@@ -65,4 +65,42 @@ $$;
 
 grant execute on function public.get_public_menu(uuid) to anon, authenticated;
 
+create or replace function public.prevent_owner_reenable_menu()
+returns trigger
+language plpgsql
+as $$
+begin
+  if old.is_online is distinct from true
+     and new.is_online is true
+     and current_setting('app.allow_admin_online', true) is distinct from 'on'
+  then
+    raise exception 'Only admin can put a menu back online';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists restaurants_prevent_reenable on public.restaurants;
+create trigger restaurants_prevent_reenable
+  before update of is_online on public.restaurants
+  for each row
+  execute function public.prevent_owner_reenable_menu();
+
+drop function if exists public.admin_set_menu_online(uuid, boolean);
+create or replace function public.admin_set_menu_online(menu_id uuid, next_online boolean)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  perform set_config('app.allow_admin_online', 'on', true);
+  update public.restaurants
+  set is_online = next_online
+  where id = menu_id;
+end;
+$$;
+
+grant execute on function public.admin_set_menu_online(uuid, boolean) to anon, authenticated;
+
 notify pgrst, 'reload schema';

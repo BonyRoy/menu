@@ -61,25 +61,25 @@ export default function DashboardPage() {
     navigate("/");
   };
 
-  const toggleOnline = async (restaurant) => {
-    const next = restaurant.is_online === false;
+  const goOffline = async (restaurant) => {
+    if (restaurant.is_online === false) return;
     setTogglingId(restaurant.id);
     const { error } = await requireSupabase()
       .from("restaurants")
-      .update({ is_online: next })
+      .update({ is_online: false })
       .eq("id", restaurant.id)
       .eq("user_id", user.id);
     setTogglingId(null);
 
     if (error) {
-      toast.error(error.message || "Could not update menu visibility");
+      toast.error(error.message || "Could not take menu offline");
       return;
     }
 
     setRestaurants((prev) =>
-      prev.map((item) => (item.id === restaurant.id ? { ...item, is_online: next } : item)),
+      prev.map((item) => (item.id === restaurant.id ? { ...item, is_online: false } : item)),
     );
-    toast.success(next ? "Menu is online" : "Menu is offline");
+    toast.success("Menu is offline. An admin can put it back online.");
   };
 
   const copyMenuLink = async (id) => {
@@ -200,18 +200,16 @@ export default function DashboardPage() {
                     <Copy01 />
                     Copy link
                   </button>
-                  <button
-                    type="button"
-                    className="btn btn--ghost btn--sm restaurant-card__btn"
-                    onClick={() => toggleOnline(r)}
-                    disabled={togglingId === r.id}
-                  >
-                    {togglingId === r.id
-                      ? "Updating…"
-                      : r.is_online === false
-                        ? "Go online"
-                        : "Go offline"}
-                  </button>
+                  {r.is_online !== false && (
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--sm restaurant-card__btn"
+                      onClick={() => goOffline(r)}
+                      disabled={togglingId === r.id}
+                    >
+                      {togglingId === r.id ? "Updating…" : "Go offline"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="btn btn--danger btn--sm restaurant-card__btn"
