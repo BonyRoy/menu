@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Copy01, LinkExternal01, SearchMd, Trash01, XClose } from "@untitledui/icons";
+import { Copy01, LinkExternal01, LogOut01, SearchMd, Trash01, XClose } from "@untitledui/icons";
 import { requireSupabase } from "../lib/supabase";
+import { clearAdminSession, getAdminSession, setAdminSession } from "../lib/adminSession";
 import Spinner, { SpinnerButton } from "../components/Spinner";
+import PasswordField from "../components/PasswordField";
 import MenuQrCode from "../components/MenuQrCode";
 import "../styles/platform.scss";
 
@@ -34,9 +36,148 @@ function groupByAccount(rows) {
   return [...map.values()];
 }
 
+function FilterChip({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      className={`admin-filter__chip ${active ? "is-active" : ""}`}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+function CredentialsTab() {
+  const session = getAdminSession();
+  const [currentId, setCurrentId] = useState(session?.loginId || "");
+  const [loginId, setLoginId] = useState(session?.loginId || "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadId() {
+      try {
+        const { data } = await requireSupabase().rpc("admin_get_login_id");
+        if (data) {
+          setCurrentId(data);
+          setLoginId(data);
+        }
+      } catch {
+        /* keep session value */
+      }
+    }
+
+    loadId();
+  }, []);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (newPassword && newPassword !== confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { error } = await requireSupabase().rpc("admin_update_credentials", {
+        p_current_password: currentPassword,
+        p_new_login_id: loginId.trim(),
+        p_new_password: newPassword,
+      });
+
+      if (error) {
+        toast.error(error.message || "Could not update credentials");
+        return;
+      }
+
+      setAdminSession(loginId.trim());
+      setCurrentId(loginId.trim());
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      toast.success("Admin credentials updated");
+    } catch (err) {
+      toast.error(err.message || "Could not update credentials");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="admin-credentials">
+      <div className="dashboard-top">
+        <div>
+          <h1>Admin credentials</h1>
+          <p className="auth-muted">
+            Change the admin ID and password used to open this page.
+          </p>
+        </div>
+      </div>
+
+      <form className="admin-credentials__form" onSubmit={handleSave}>
+        <p className="auth-muted">
+          Current ID: <strong>{currentId || "—"}</strong>
+        </p>
+
+        <label className="auth-field">
+          <span>Admin ID</span>
+          <input
+            type="text"
+            value={loginId}
+            onChange={(e) => setLoginId(e.target.value)}
+            required
+            disabled={saving}
+          />
+        </label>
+
+        <PasswordField
+          label="Current password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          disabled={saving}
+          autoComplete="current-password"
+        />
+
+        <PasswordField
+          label="New password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          disabled={saving}
+          required={false}
+          autoComplete="new-password"
+          placeholder="Leave blank to keep current password"
+        />
+
+        <PasswordField
+          label="Confirm new password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          disabled={saving}
+          required={false}
+          autoComplete="new-password"
+          placeholder="Repeat new password"
+        />
+
+        <button type="submit" className="btn btn--primary" disabled={saving}>
+          <SpinnerButton loading={saving}>
+            {saving ? "Saving…" : "Save credentials"}
+          </SpinnerButton>
+        </button>
+      </form>
+    </div>
+  );
+}
+
 export default function AdminPage() {
+  const navigate = useNavigate();
+  const [tab, setTab] = useState("accounts");
   const [rows, setRows] = useState([]);
   const [query, setQuery] = useState("");
+  const [accountFilter, setAccountFilter] = useState("all");
+  const [menuFilter, setMenuFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -81,18 +222,31 @@ export default function AdminPage() {
     () => accounts.reduce((total, account) => total + account.menus.length, 0),
     [accounts],
   );
+  const withMenusCount = useMemo(
+    () => accounts.filter((account) => account.menus.length > 0).length,
+    [accounts],
+  );
+  const noMenusCount = accounts.length - withMenusCount;
+  const enabledCount = useMemo(
+    () => accounts.reduce((total, account) => (
+      total + account.menus.filter((menu) => menu.is_online !== false).length
+    ), 0),
+    [accounts],
+  );
+  const disabledCount = menuCount - enabledCount;
 
   const filteredAccounts = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    if (!needle) return accounts;
 
     return accounts
       .map((account) => {
-        const accountMatch =
+        const accountMatch = !needle || (
           account.email.toLowerCase().includes(needle) ||
-          account.userId.toLowerCase().includes(needle);
+          account.userId.toLowerCase().includes(needle)
+        );
 
-        const menus = account.menus.filter((menu) => {
+        let menus = account.menus.filter((menu) => {
+          if (!needle || accountMatch) return true;
           const haystack = [menu.name, menu.phone, menu.id]
             .filter(Boolean)
             .join(" ")
@@ -100,12 +254,22 @@ export default function AdminPage() {
           return haystack.includes(needle);
         });
 
-        if (accountMatch) return account;
-        if (menus.length === 0) return null;
+        if (menuFilter === "enabled") {
+          menus = menus.filter((menu) => menu.is_online !== false);
+        }
+        if (menuFilter === "disabled") {
+          menus = menus.filter((menu) => menu.is_online === false);
+        }
+
+        if (needle && !accountMatch && menus.length === 0) return null;
+        if (accountFilter === "with-menus" && account.menus.length === 0) return null;
+        if (accountFilter === "no-menus" && account.menus.length > 0) return null;
+        if (menuFilter !== "all" && menus.length === 0) return null;
+
         return { ...account, menus };
       })
       .filter(Boolean);
-  }, [accounts, query]);
+  }, [accounts, query, accountFilter, menuFilter]);
 
   const toggleOnline = async (menu) => {
     const next = menu.is_online === false;
@@ -124,7 +288,7 @@ export default function AdminPage() {
     setRows((prev) =>
       prev.map((row) => (row.id === menu.id ? { ...row, is_online: next } : row)),
     );
-    toast.success(next ? "Menu is online" : "Menu is offline");
+    toast.success(next ? "Menu enabled" : "Menu disabled");
   };
 
   const copyMenuLink = async (id) => {
@@ -140,6 +304,23 @@ export default function AdminPage() {
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
+
+    if (deleteTarget.type === "account") {
+      const { error } = await requireSupabase().rpc("admin_delete_account", {
+        target_user_id: deleteTarget.userId,
+      });
+      setDeleting(false);
+
+      if (error) {
+        toast.error(error.message || "Failed to delete account");
+        return;
+      }
+
+      setRows((prev) => prev.filter((row) => row.user_id !== deleteTarget.userId));
+      toast.success(`${deleteTarget.email || "Account"} deleted`);
+      setDeleteTarget(null);
+      return;
+    }
 
     const { error } = await requireSupabase()
       .from("restaurants")
@@ -177,32 +358,104 @@ export default function AdminPage() {
           <img src="/logo.png" alt="" className="platform-nav__logo" />
           MenuCraft Admin
         </span>
-        <span className="dashboard-header__email">
-          {accounts.length} account{accounts.length === 1 ? "" : "s"} ·{" "}
-          {menuCount} menu{menuCount === 1 ? "" : "s"}
-        </span>
+        <div className="dashboard-header__actions">
+          <span className="dashboard-header__email">
+            {accounts.length} account{accounts.length === 1 ? "" : "s"} ·{" "}
+            {menuCount} menu{menuCount === 1 ? "" : "s"}
+          </span>
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            onClick={() => {
+              clearAdminSession();
+              navigate("/admin/login", { replace: true });
+            }}
+          >
+            <LogOut01 />
+            Sign out
+          </button>
+        </div>
       </header>
 
       <main className="dashboard-main">
+        <div className="admin-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            className={`admin-tabs__tab ${tab === "accounts" ? "is-active" : ""}`}
+            aria-selected={tab === "accounts"}
+            onClick={() => setTab("accounts")}
+          >
+            Accounts
+          </button>
+          <button
+            type="button"
+            role="tab"
+            className={`admin-tabs__tab ${tab === "credentials" ? "is-active" : ""}`}
+            aria-selected={tab === "credentials"}
+            onClick={() => setTab("credentials")}
+          >
+            Credentials
+          </button>
+        </div>
+
+        {tab === "credentials" ? <CredentialsTab /> : null}
+
+        {tab === "accounts" ? (
+          <>
         <div className="dashboard-top">
           <div>
             <h1>All accounts</h1>
             <p className="auth-muted">
-              Every Google account, with or without menus.
+              Filter accounts and menus, or delete an account entirely.
             </p>
           </div>
         </div>
 
-        <label className="admin-search">
-          <SearchMd />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search email, account, or menu…"
-            aria-label="Search accounts and menus"
-          />
-        </label>
+        <div className="admin-toolbar">
+          <label className="admin-search">
+            <SearchMd />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search email, account, or menu…"
+              aria-label="Search accounts and menus"
+            />
+          </label>
+
+          <div className="admin-filters">
+            <div className="admin-filter">
+              <span className="admin-filter__label">Accounts</span>
+              <div className="admin-filter__chips">
+                <FilterChip active={accountFilter === "all"} onClick={() => setAccountFilter("all")}>
+                  All ({accounts.length})
+                </FilterChip>
+                <FilterChip active={accountFilter === "with-menus"} onClick={() => setAccountFilter("with-menus")}>
+                  With menus ({withMenusCount})
+                </FilterChip>
+                <FilterChip active={accountFilter === "no-menus"} onClick={() => setAccountFilter("no-menus")}>
+                  No menus ({noMenusCount})
+                </FilterChip>
+              </div>
+            </div>
+
+            <div className="admin-filter">
+              <span className="admin-filter__label">Menus</span>
+              <div className="admin-filter__chips">
+                <FilterChip active={menuFilter === "all"} onClick={() => setMenuFilter("all")}>
+                  All ({menuCount})
+                </FilterChip>
+                <FilterChip active={menuFilter === "enabled"} onClick={() => setMenuFilter("enabled")}>
+                  Enabled ({enabledCount})
+                </FilterChip>
+                <FilterChip active={menuFilter === "disabled"} onClick={() => setMenuFilter("disabled")}>
+                  Disabled ({disabledCount})
+                </FilterChip>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {loading ? (
           <div className="spinner spinner--page">
@@ -210,7 +463,7 @@ export default function AdminPage() {
           </div>
         ) : filteredAccounts.length === 0 ? (
           <div className="dashboard-empty">
-            <p>{query.trim() ? "No matching accounts or menus." : "No accounts yet."}</p>
+            <p>No matching accounts or menus.</p>
           </div>
         ) : (
           <ul className="admin-account-list">
@@ -221,9 +474,19 @@ export default function AdminPage() {
                     <h2>{account.email || "Account"}</h2>
                     <code className="admin-account__id">{shortId(account.userId)}</code>
                   </div>
-                  <span className="admin-account__count">
-                    {account.menus.length} menu{account.menus.length === 1 ? "" : "s"}
-                  </span>
+                  <div className="admin-account__meta">
+                    <span className="admin-account__count">
+                      {account.menus.length} menu{account.menus.length === 1 ? "" : "s"}
+                    </span>
+                    <button
+                      type="button"
+                      className="admin-menu__delete"
+                      onClick={() => setDeleteTarget({ type: "account", ...account })}
+                      aria-label={`Delete account ${account.email || account.userId}`}
+                    >
+                      <Trash01 />
+                    </button>
+                  </div>
                 </div>
 
                 {account.menus.length === 0 ? (
@@ -232,29 +495,34 @@ export default function AdminPage() {
                   <ul className="admin-menu-list">
                     {account.menus.map((menu) => (
                       <li key={menu.id} className="admin-menu">
-                        <div className="admin-menu__identity">
-                          <div className="restaurant-card__logo">
-                            {menu.logo_url ? (
-                              <img src={menu.logo_url} alt="" />
-                            ) : (
-                              <span aria-hidden="true">
-                                {menu.name?.charAt(0)?.toUpperCase() || "M"}
-                              </span>
-                            )}
+                        <div className="admin-menu__top">
+                          <div className="admin-menu__identity">
+                            <div className="restaurant-card__logo">
+                              {menu.logo_url ? (
+                                <img src={menu.logo_url} alt="" />
+                              ) : (
+                                <span aria-hidden="true">
+                                  {menu.name?.charAt(0)?.toUpperCase() || "M"}
+                                </span>
+                              )}
+                            </div>
+                            <div className="admin-menu__body">
+                              <div className="admin-menu__title">
+                                <h3>{menu.name}</h3>
+                                <span className={`menu-status ${menu.is_online === false ? "is-off" : "is-on"}`}>
+                                  {menu.is_online === false ? "Disabled" : "Enabled"}
+                                </span>
+                              </div>
+                              {menu.phone ? (
+                                <p className="auth-muted">{menu.phone}</p>
+                              ) : null}
+                              <code className="admin-menu__id" title={menu.id}>
+                                {shortId(menu.id)}
+                              </code>
+                            </div>
                           </div>
-                          <div className="admin-menu__body">
-                            <h3>{menu.name}</h3>
-                            {menu.phone ? (
-                              <p className="auth-muted">{menu.phone}</p>
-                            ) : null}
-                            <code className="restaurant-card__uuid">{menu.id}</code>
-                            <span className={`menu-status ${menu.is_online === false ? "is-off" : "is-on"}`}>
-                              {menu.is_online === false ? "Offline" : "Online"}
-                            </span>
-                          </div>
+                          <MenuQrCode restaurantId={menu.id} restaurantName={menu.name} />
                         </div>
-
-                        <MenuQrCode restaurantId={menu.id} restaurantName={menu.name} />
 
                         <div className="admin-menu__actions">
                           <Link
@@ -266,15 +534,15 @@ export default function AdminPage() {
                           </Link>
                           <button
                             type="button"
-                            className="btn btn--copy btn--sm"
+                            className="btn btn--ghost btn--sm"
                             onClick={() => copyMenuLink(menu.id)}
                           >
                             <Copy01 />
-                            Copy link
+                            Copy
                           </button>
                           <button
                             type="button"
-                            className={`admin-menu__toggle ${menu.is_online === false ? "is-off" : "is-on"}`}
+                            className={`btn btn--sm admin-menu__toggle ${menu.is_online === false ? "is-off" : "is-on"}`}
                             onClick={() => toggleOnline(menu)}
                             disabled={togglingId === menu.id}
                             aria-pressed={menu.is_online !== false}
@@ -287,11 +555,11 @@ export default function AdminPage() {
                           </button>
                           <button
                             type="button"
-                            className="admin-menu__delete"
-                            onClick={() => setDeleteTarget(menu)}
-                            aria-label={`Delete ${menu.name}`}
+                            className="btn btn--danger btn--sm"
+                            onClick={() => setDeleteTarget({ type: "menu", ...menu })}
                           >
                             <Trash01 />
+                            Delete
                           </button>
                         </div>
                       </li>
@@ -302,6 +570,8 @@ export default function AdminPage() {
             ))}
           </ul>
         )}
+          </>
+        ) : null}
       </main>
 
       {deleteTarget && (
@@ -314,7 +584,9 @@ export default function AdminPage() {
           />
           <div className="confirm-modal__panel">
             <div className="confirm-modal__head">
-              <h2 id="admin-delete-title">Delete menu?</h2>
+              <h2 id="admin-delete-title">
+                {deleteTarget.type === "account" ? "Delete account?" : "Delete menu?"}
+              </h2>
               <button
                 type="button"
                 className="confirm-modal__close"
@@ -326,8 +598,18 @@ export default function AdminPage() {
               </button>
             </div>
             <p className="confirm-modal__text">
-              This will permanently delete <strong>{deleteTarget.name}</strong> and
-              its menu. This cannot be undone.
+              {deleteTarget.type === "account" ? (
+                <>
+                  This will permanently delete{" "}
+                  <strong>{deleteTarget.email || "this account"}</strong> and all of
+                  their menus. This cannot be undone.
+                </>
+              ) : (
+                <>
+                  This will permanently delete <strong>{deleteTarget.name}</strong> and
+                  its menu. This cannot be undone.
+                </>
+              )}
             </p>
             <div className="confirm-modal__actions">
               <button

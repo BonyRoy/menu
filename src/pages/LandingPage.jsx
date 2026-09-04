@@ -1,5 +1,15 @@
 import { Link } from "react-router-dom";
-import { ChevronRight, LayoutGrid01, PhoneCall01, Zap } from "@untitledui/icons";
+import {
+  Check,
+  ChevronRight,
+  Cloud01,
+  Heart,
+  MarkerPin01,
+  QrCode01,
+  Shield01,
+  XClose,
+  Zap,
+} from "@untitledui/icons";
 import { DEFAULT_HERO_IMAGE } from "../lib/supabase";
 import "../styles/platform.scss";
 
@@ -9,7 +19,7 @@ export default function LandingPage() {
       <header className="platform-nav">
         <Link to="/" className="platform-nav__brand">
           <img src="/logo.png" alt="" className="platform-nav__logo" />
-          MenuCraft
+          MenuCraft RMS
         </Link>
         <nav className="platform-nav__links">
           <Link to="/auth" className="btn btn--primary platform-nav__cta">
@@ -18,61 +28,106 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      <section className="platform-hero">
-        <div className="platform-hero__media">
-          <img src={DEFAULT_HERO_IMAGE} alt="" />
-          <div className="platform-hero__wash" />
-        </div>
-        <div className="platform-hero__content">
-          <p className="platform-hero__eyebrow">Digital menus for restaurants</p>
+      <section className="landing-hero">
+        <div className="landing-hero__copy">
+          <div className="landing-hero__media">
+            <img src={DEFAULT_HERO_IMAGE} alt="" />
+            <div className="landing-hero__wash" />
+          </div>
+          <p className="landing-hero__eyebrow">Digital menu management</p>
           <h1>
-            Create a beautiful menu.
+            Smart Menus.
             <br />
-            Share it with one link.
+            Smarter Business.
           </h1>
-          <p className="platform-hero__sub">
-            Continue with Google, fill in your restaurant details and menu,
-            upload your logo and hero image, then share your unique menu URL
-            with customers.
+          <p className="landing-hero__sub">
+            Easy menu management, instant QR sharing, and a cloud-based
+            dashboard so your restaurant stays updated in real time.
           </p>
-          <div className="platform-hero__actions">
+          <div className="landing-hero__actions">
             <Link to="/auth" className="btn btn--primary">
-              Continue with Google
+              Login / Sign up
               <ChevronRight />
             </Link>
           </div>
         </div>
+
+        <div className="landing-hero__features">
+          <article className="platform-feature">
+            <Zap />
+            <h3>Easy menu management</h3>
+            <p>
+              Add, edit, and organize dishes in minutes. Updates go live
+              instantly for every customer.
+            </p>
+          </article>
+          <article className="platform-feature">
+            <QrCode01 />
+            <h3>Instant QR sharing</h3>
+            <p>
+              Generate a QR code and unique menu link. Share it on WhatsApp,
+              tables, or Google.
+            </p>
+          </article>
+          <article className="platform-feature">
+            <Cloud01 />
+            <h3>Cloud based</h3>
+            <p>
+              Access your dashboard from any device. No printing, no reprinting,
+              no extra hardware.
+            </p>
+          </article>
+        </div>
       </section>
 
-      <section className="platform-features">
-        <article className="platform-feature">
-          <Zap />
-          <h3>Fast setup</h3>
-          <p>
-            Add your restaurant details, upload a logo and cover photo, and fill
-            in your dishes — ready in minutes.
-          </p>
-        </article>
-        <article className="platform-feature">
-          <LayoutGrid01 />
-          <h3>Looks great everywhere</h3>
-          <p>
-            Your menu works smoothly on phones, tablets, and computers, with easy
-            veg and non-veg filters for customers.
-          </p>
-        </article>
-        <article className="platform-feature">
-          <PhoneCall01 />
-          <h3>One link to share</h3>
-          <p>
-            Get a personal menu link for your restaurant. Share it on WhatsApp,
-            print a QR code, or add it to Google Maps.
-          </p>
-        </article>
+      <section className="landing-compare">
+        <h2>From paper menus to smart menus</h2>
+        <div className="landing-compare__grid">
+          <article className="landing-compare__card is-old">
+            <XClose />
+            <h3>Paper menu</h3>
+            <ul>
+              <li>Hard to update</li>
+              <li>Gets dirty and outdated</li>
+              <li>No filters or search</li>
+            </ul>
+          </article>
+          <article className="landing-compare__card is-new">
+            <Check />
+            <h3>Smart menu</h3>
+            <ul>
+              <li>Update once, live everywhere</li>
+              <li>Looks great on every phone</li>
+              <li>QR code ready to share</li>
+            </ul>
+          </article>
+        </div>
       </section>
 
-      <footer className="platform-footer">
-        <p>MenuCraft — powered by Supabase</p>
+      <section className="landing-cta">
+        <h2>Start building your menu now</h2>
+        <Link to="/auth" className="btn btn--primary">
+          Get started
+          <ChevronRight />
+        </Link>
+      </section>
+
+      <footer className="landing-footer">
+        <div className="landing-footer__values">
+          <span>
+            <Shield01 /> Secure & reliable
+          </span>
+          <span>
+            <Zap /> Fast & easy
+          </span>
+          <span>
+            <MarkerPin01 /> Eco-friendly
+          </span>
+          <span>
+            <Heart /> Made for restaurateurs
+          </span>
+        </div>
+        <p>MenuCraft RMS</p>
       </footer>
     </div>
   );

@@ -9,6 +9,8 @@ import DashboardPage from "./pages/DashboardPage";
 import RestaurantFormPage from "./pages/RestaurantFormPage";
 import MenuPage from "./pages/MenuPage";
 import AdminPage from "./pages/AdminPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminGate from "./components/AdminGate";
 import "./styles/platform.scss";
 
 function App() {
@@ -45,7 +47,15 @@ function App() {
             }
           />
           <Route path="/menu/:uuid" element={<MenuPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminGate>
+                <AdminPage />
+              </AdminGate>
+            }
+          />
         </Routes>
       </BrowserRouter>
 
