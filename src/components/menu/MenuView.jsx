@@ -49,8 +49,13 @@ export default function MenuView({ restaurant, menus }) {
   const sectionNavLinkRefs = useRef({});
 
   const brand = parseBrandName(restaurant.name);
-  const heroImage = restaurant.hero_image_url || DEFAULT_HERO_IMAGE;
   const logoUrl = restaurant.logo_url;
+  const customHero =
+    restaurant.hero_image_url &&
+    restaurant.hero_image_url !== DEFAULT_HERO_IMAGE
+      ? restaurant.hero_image_url
+      : null;
+  const heroImage = customHero || logoUrl || DEFAULT_HERO_IMAGE;
   const currency = restaurant.currency || "INR";
   const themeVars = themeToCssVars(restaurant.theme);
 
@@ -242,7 +247,10 @@ export default function MenuView({ restaurant, menus }) {
         </div>
       </header>
 
-      <section className="hero">
+      <section
+        className="hero"
+        style={{ "--hero-image": `url("${heroImage}")` }}
+      >
         <div className="hero__media" aria-hidden="true">
           <img src={heroImage} alt="" />
           <div className="hero__wash" />
