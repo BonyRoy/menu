@@ -72,6 +72,7 @@ export default function MenuPage() {
         logo_url: data.logo_url,
         hero_image_url: data.hero_image_url,
         theme: data.theme,
+        venue: data.venue,
       });
       setMenus(data.menu_data);
       setLoading(false);

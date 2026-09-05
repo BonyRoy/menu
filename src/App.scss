@@ -456,6 +456,12 @@ body:has(.page) {
       line-height: 1.45;
       color: rgba(255, 245, 238, 0.88);
     }
+
+    a {
+      color: #ffb39a;
+      font-weight: 600;
+      text-decoration: none;
+    }
   }
 }
 

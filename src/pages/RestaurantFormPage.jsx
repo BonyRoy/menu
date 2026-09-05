@@ -14,6 +14,7 @@ import MenuBuilder, {
   validateBuilder,
 } from "../components/MenuBuilder";
 import Spinner, { SpinnerButton } from "../components/Spinner";
+import LocationPicker from "../components/LocationPicker";
 import { DEFAULT_THEME, THEME_PRESETS, resolveTheme } from "../lib/themes";
 import "../styles/platform.scss";
 
@@ -25,6 +26,74 @@ const EMPTY_FORM = {
   currency: "",
 };
 
+function newTableGroup() {
+  return { id: crypto.randomUUID(), count: "", seats: "" };
+}
+
+function emptyVenue() {
+  return {
+    lat: "",
+    lng: "",
+    tableGroups: [newTableGroup()],
+    parkingAvailable: false,
+    twoWheelers: "",
+    fourWheelers: "",
+    higherFloor: false,
+    elevatorAvailable: false,
+    ambiance: "",
+  };
+}
+
+function normalizeVenue(raw) {
+  if (!raw || typeof raw !== "object") return emptyVenue();
+  const groups =
+    Array.isArray(raw.tableGroups) && raw.tableGroups.length
+      ? raw.tableGroups.map((group) => ({
+          id: group.id || crypto.randomUUID(),
+          count: group.count === 0 || group.count ? String(group.count) : "",
+          seats: group.seats === 0 || group.seats ? String(group.seats) : "",
+        }))
+      : [newTableGroup()];
+  return {
+    lat: raw.lat != null && raw.lat !== "" ? String(raw.lat) : "",
+    lng: raw.lng != null && raw.lng !== "" ? String(raw.lng) : "",
+    tableGroups: groups,
+    parkingAvailable: Boolean(raw.parkingAvailable),
+    twoWheelers:
+      raw.twoWheelers === 0 || raw.twoWheelers ? String(raw.twoWheelers) : "",
+    fourWheelers:
+      raw.fourWheelers === 0 || raw.fourWheelers
+        ? String(raw.fourWheelers)
+        : "",
+    higherFloor: Boolean(raw.higherFloor),
+    elevatorAvailable: Boolean(raw.elevatorAvailable),
+    ambiance: raw.ambiance || "",
+  };
+}
+
+function venueForSave(venue) {
+  const tableGroups = (venue.tableGroups || [])
+    .map((group) => ({
+      count: Number(group.count),
+      seats: Number(group.seats),
+    }))
+    .filter((group) => group.count > 0 && group.seats > 0);
+
+  return {
+    lat: venue.lat.trim() || null,
+    lng: venue.lng.trim() || null,
+    tableGroups,
+    parkingAvailable: Boolean(venue.parkingAvailable),
+    twoWheelers: venue.parkingAvailable ? Number(venue.twoWheelers) || 0 : 0,
+    fourWheelers: venue.parkingAvailable ? Number(venue.fourWheelers) || 0 : 0,
+    higherFloor: Boolean(venue.higherFloor),
+    elevatorAvailable: venue.higherFloor
+      ? Boolean(venue.elevatorAvailable)
+      : false,
+    ambiance: venue.ambiance.trim() || null,
+  };
+}
+
 function snapshotOf({
   form,
   menuBuilder,
@@ -33,6 +102,7 @@ function snapshotOf({
   existingLogoUrl,
   existingHeroUrl,
   themeId,
+  venue,
 }) {
   return JSON.stringify({
     form,
@@ -42,6 +112,13 @@ function snapshotOf({
     existingLogoUrl: existingLogoUrl || "",
     existingHeroUrl: existingHeroUrl || "",
     themeId: themeId || DEFAULT_THEME.id,
+    venue: {
+      ...venue,
+      tableGroups: (venue?.tableGroups || []).map(({ count, seats }) => ({
+        count,
+        seats,
+      })),
+    },
   });
 }
 
@@ -65,6 +142,7 @@ export default function RestaurantFormPage() {
   const [baseline, setBaseline] = useState(null);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [themeId, setThemeId] = useState(DEFAULT_THEME.id);
+  const [venue, setVenue] = useState(() => emptyVenue());
 
   useEffect(() => {
     if (isEdit) return;
@@ -77,6 +155,7 @@ export default function RestaurantFormPage() {
         existingLogoUrl: null,
         existingHeroUrl: null,
         themeId: DEFAULT_THEME.id,
+        venue: emptyVenue(),
       }),
     );
   }, [isEdit]);
@@ -109,10 +188,12 @@ export default function RestaurantFormPage() {
       };
       const nextMenu = menusToBuilder(data.menu_data);
       const nextThemeId = resolveTheme(data.theme).id;
+      const nextVenue = normalizeVenue(data.venue);
 
       setForm(nextForm);
       setMenuBuilder(nextMenu);
       setThemeId(nextThemeId);
+      setVenue(nextVenue);
       setExistingLogoUrl(data.logo_url);
       setExistingHeroUrl(data.hero_image_url);
       if (data.logo_url) setLogoPreview(data.logo_url);
@@ -126,6 +207,7 @@ export default function RestaurantFormPage() {
           existingLogoUrl: data.logo_url,
           existingHeroUrl: data.hero_image_url,
           themeId: nextThemeId,
+          venue: nextVenue,
         }),
       );
       setLoading(false);
@@ -145,6 +227,7 @@ export default function RestaurantFormPage() {
         existingLogoUrl,
         existingHeroUrl,
         themeId,
+        venue,
       }) !== baseline
     );
   }, [
@@ -156,11 +239,52 @@ export default function RestaurantFormPage() {
     existingLogoUrl,
     existingHeroUrl,
     themeId,
+    venue,
   ]);
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
+
+  const updateVenue = (patch) => {
+    setVenue((prev) => ({ ...prev, ...patch }));
+  };
+
+  const updateTableGroup = (id, field, value) => {
+    setVenue((prev) => ({
+      ...prev,
+      tableGroups: prev.tableGroups.map((group) =>
+        group.id === id ? { ...group, [field]: value } : group,
+      ),
+    }));
+  };
+
+  const addTableGroup = () => {
+    setVenue((prev) => ({
+      ...prev,
+      tableGroups: [...prev.tableGroups, newTableGroup()],
+    }));
+  };
+
+  const removeTableGroup = (id) => {
+    setVenue((prev) => {
+      const next = prev.tableGroups.filter((group) => group.id !== id);
+      return {
+        ...prev,
+        tableGroups: next.length ? next : [newTableGroup()],
+      };
+    });
+  };
+
+  const tableTotal = venue.tableGroups.reduce(
+    (sum, group) => sum + (Number(group.count) || 0),
+    0,
+  );
+  const seatTotal = venue.tableGroups.reduce(
+    (sum, group) =>
+      sum + (Number(group.count) || 0) * (Number(group.seats) || 0),
+    0,
+  );
 
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
@@ -246,6 +370,7 @@ export default function RestaurantFormPage() {
         hero_image_url: heroUrl,
         menu_data: menuData,
         theme: { id: themeId },
+        venue: venueForSave(venue),
       };
 
       const { error: saveError } = isEdit
@@ -359,6 +484,213 @@ export default function RestaurantFormPage() {
                 />
               </label>
             </div>
+          </section>
+
+          <section className="form-section">
+            <h2>Optional venue details</h2>
+            <p className="form-hint">
+              Add location, seating, parking, and ambiance if you want guests
+              to see them on the public menu. Skip anything that does not apply.
+            </p>
+            <LocationPicker
+              lat={venue.lat}
+              lng={venue.lng}
+              disabled={saving}
+              onChange={({ lat, lng }) => updateVenue({ lat, lng })}
+            />
+
+            <div className="venue-block">
+              <div className="venue-block__head">
+                <h3>Tables</h3>
+                <button
+                  type="button"
+                  className="btn btn--ghost btn--sm"
+                  onClick={addTableGroup}
+                  disabled={saving}
+                >
+                  Add table type
+                </button>
+              </div>
+              <p className="form-hint">
+                Example: 2 tables with 4 seats and 2 tables with 6 seats.
+              </p>
+              <div className="table-config">
+                {venue.tableGroups.map((group, index) => (
+                  <div key={group.id} className="table-config__row">
+                    <label className="auth-field">
+                      <span>{index === 0 ? "Number of tables" : "Tables"}</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={group.count}
+                        onChange={(e) =>
+                          updateTableGroup(group.id, "count", e.target.value)
+                        }
+                        placeholder="2"
+                        disabled={saving}
+                      />
+                    </label>
+                    <label className="auth-field">
+                      <span>{index === 0 ? "Seats per table" : "Seats"}</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={group.seats}
+                        onChange={(e) =>
+                          updateTableGroup(group.id, "seats", e.target.value)
+                        }
+                        placeholder="4"
+                        disabled={saving}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="table-config__remove"
+                      onClick={() => removeTableGroup(group.id)}
+                      disabled={saving || venue.tableGroups.length === 1}
+                      aria-label="Remove table type"
+                    >
+                      <XClose />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {(tableTotal > 0 || seatTotal > 0) && (
+                <p className="table-config__total">
+                  {tableTotal} table{tableTotal === 1 ? "" : "s"}
+                  {seatTotal > 0 ? ` · ${seatTotal} seats total` : ""}
+                </p>
+              )}
+            </div>
+
+            <div className="venue-block">
+              <h3>Parking</h3>
+              <div className="choice-row" role="group" aria-label="Parking available">
+                <span className="choice-row__label">Is parking available?</span>
+                <div className="choice-pills">
+                  <button
+                    type="button"
+                    className={!venue.parkingAvailable ? "is-on" : ""}
+                    onClick={() => updateVenue({ parkingAvailable: false })}
+                    disabled={saving}
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    className={venue.parkingAvailable ? "is-on" : ""}
+                    onClick={() => updateVenue({ parkingAvailable: true })}
+                    disabled={saving}
+                  >
+                    Yes
+                  </button>
+                </div>
+              </div>
+              {venue.parkingAvailable && (
+                <div className="form-grid">
+                  <label className="auth-field">
+                    <span>Two-wheeler spots</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={venue.twoWheelers}
+                      onChange={(e) =>
+                        updateVenue({ twoWheelers: e.target.value })
+                      }
+                      placeholder="10"
+                      disabled={saving}
+                    />
+                  </label>
+                  <label className="auth-field">
+                    <span>Four-wheeler spots</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={venue.fourWheelers}
+                      onChange={(e) =>
+                        updateVenue({ fourWheelers: e.target.value })
+                      }
+                      placeholder="6"
+                      disabled={saving}
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
+
+            <div className="venue-block">
+              <h3>Floor access</h3>
+              <div
+                className="choice-row"
+                role="group"
+                aria-label="Higher floor"
+              >
+                <span className="choice-row__label">
+                  Is the restaurant on a higher floor?
+                </span>
+                <div className="choice-pills">
+                  <button
+                    type="button"
+                    className={!venue.higherFloor ? "is-on" : ""}
+                    onClick={() =>
+                      updateVenue({
+                        higherFloor: false,
+                        elevatorAvailable: false,
+                      })
+                    }
+                    disabled={saving}
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    className={venue.higherFloor ? "is-on" : ""}
+                    onClick={() => updateVenue({ higherFloor: true })}
+                    disabled={saving}
+                  >
+                    Yes
+                  </button>
+                </div>
+              </div>
+              {venue.higherFloor && (
+                <div
+                  className="choice-row"
+                  role="group"
+                  aria-label="Elevator available"
+                >
+                  <span className="choice-row__label">Is an elevator available?</span>
+                  <div className="choice-pills">
+                    <button
+                      type="button"
+                      className={!venue.elevatorAvailable ? "is-on" : ""}
+                      onClick={() => updateVenue({ elevatorAvailable: false })}
+                      disabled={saving}
+                    >
+                      No
+                    </button>
+                    <button
+                      type="button"
+                      className={venue.elevatorAvailable ? "is-on" : ""}
+                      onClick={() => updateVenue({ elevatorAvailable: true })}
+                      disabled={saving}
+                    >
+                      Yes
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <label className="auth-field">
+              <span>Ambiance</span>
+              <textarea
+                value={venue.ambiance}
+                onChange={(e) => updateVenue({ ambiance: e.target.value })}
+                rows={3}
+                placeholder="Beach view, courtyard seating, live music on weekends…"
+                disabled={saving}
+              />
+            </label>
           </section>
 
           <section className="form-section">

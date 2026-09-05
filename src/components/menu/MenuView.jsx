@@ -21,6 +21,40 @@ import { themeToCssVars } from "../../lib/themes";
 import "../../App.scss";
 import "../../styles/platform.scss";
 
+function venueLines(venue) {
+  if (!venue || typeof venue !== "object") return [];
+  const lines = [];
+  const groups = Array.isArray(venue.tableGroups)
+    ? venue.tableGroups.filter((g) => Number(g.count) > 0 && Number(g.seats) > 0)
+    : [];
+  if (groups.length) {
+    const tables = groups.reduce((sum, g) => sum + Number(g.count), 0);
+    const seats = groups.reduce(
+      (sum, g) => sum + Number(g.count) * Number(g.seats),
+      0,
+    );
+    const breakdown = groups
+      .map((g) => `${g.count} × ${g.seats}-seat`)
+      .join(", ");
+    lines.push(`${tables} tables (${breakdown}, ${seats} seats)`);
+  }
+  if (venue.parkingAvailable) {
+    const bits = [];
+    if (Number(venue.twoWheelers) > 0) bits.push(`${venue.twoWheelers} two-wheelers`);
+    if (Number(venue.fourWheelers) > 0) bits.push(`${venue.fourWheelers} four-wheelers`);
+    lines.push(bits.length ? `Parking: ${bits.join(", ")}` : "Parking available");
+  }
+  if (venue.higherFloor) {
+    lines.push(
+      venue.elevatorAvailable
+        ? "Higher floor · elevator available"
+        : "Higher floor · no elevator",
+    );
+  }
+  if (venue.ambiance) lines.push(venue.ambiance);
+  return lines;
+}
+
 function WhatsAppIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
@@ -58,6 +92,13 @@ export default function MenuView({ restaurant, menus }) {
   const heroImage = customHero || logoUrl || DEFAULT_HERO_IMAGE;
   const currency = restaurant.currency || "INR";
   const themeVars = themeToCssVars(restaurant.theme);
+  const extraVenue = venueLines(restaurant.venue);
+  const mapsHref =
+    restaurant.venue?.lat && restaurant.venue?.lng
+      ? `https://www.google.com/maps?q=${encodeURIComponent(
+          `${restaurant.venue.lat},${restaurant.venue.lng}`,
+        )}`
+      : null;
 
   const activeMenu = getMenuByKey(menus, cuisine) || menuEntries[0]?.[1];
 
@@ -299,6 +340,22 @@ export default function MenuView({ restaurant, menus }) {
             <p>{restaurant.tagline}</p>
           </div>
         )}
+        {mapsHref && (
+          <div className="meta__item">
+            <MarkerPin01 />
+            <p>
+              <a href={mapsHref} target="_blank" rel="noreferrer">
+                Open in Maps
+              </a>
+            </p>
+          </div>
+        )}
+        {extraVenue.map((line) => (
+          <div key={line} className="meta__item">
+            <Zap />
+            <p>{line}</p>
+          </div>
+        ))}
       </section>
 
       <main className="menu" ref={menuRef} id="menu">
