@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Copy01, LinkExternal01, LogOut01, SearchMd, Trash01, XClose } from "@untitledui/icons";
+import { Copy01, ChevronDown, LinkExternal01, LogOut01, SearchMd, Trash01, XClose } from "@untitledui/icons";
 import { requireSupabase } from "../lib/supabase";
 import { clearAdminSession, getAdminSession, setAdminSession } from "../lib/adminSession";
 import Spinner, { SpinnerButton } from "../components/Spinner";
@@ -34,6 +34,65 @@ function groupByAccount(rows) {
     }
   }
   return [...map.values()];
+}
+
+function venueRows(venue) {
+  if (!venue || typeof venue !== "object") return [];
+  const rows = [];
+  if (venue.lat && venue.lng) {
+    rows.push({
+      label: "Location",
+      value: `${venue.lat}, ${venue.lng}`,
+      href: `https://www.google.com/maps?q=${encodeURIComponent(`${venue.lat},${venue.lng}`)}`,
+    });
+  }
+  const groups = Array.isArray(venue.tableGroups)
+    ? venue.tableGroups.filter((g) => Number(g.count) > 0 && Number(g.seats) > 0)
+    : [];
+  if (groups.length) {
+    const tables = groups.reduce((sum, g) => sum + Number(g.count), 0);
+    const seats = groups.reduce(
+      (sum, g) => sum + Number(g.count) * Number(g.seats),
+      0,
+    );
+    const breakdown = groups
+      .map((g) => `${g.count} × ${g.seats}-seat`)
+      .join(", ");
+    rows.push({
+      label: "Tables",
+      value: `${tables} tables · ${breakdown} · ${seats} seats`,
+    });
+  }
+  if (venue.parkingAvailable) {
+    const bits = [];
+    if (Number(venue.twoWheelers) > 0) bits.push(`${venue.twoWheelers} two-wheelers`);
+    if (Number(venue.fourWheelers) > 0) bits.push(`${venue.fourWheelers} four-wheelers`);
+    rows.push({
+      label: "Parking",
+      value: bits.length ? bits.join(" · ") : "Available",
+    });
+  } else if (venue.parkingAvailable === false) {
+    rows.push({ label: "Parking", value: "Not available" });
+  }
+  if (venue.higherFloor) {
+    rows.push({
+      label: "Floor access",
+      value: venue.elevatorAvailable
+        ? "Higher floor · elevator available"
+        : "Higher floor · no elevator",
+    });
+  }
+  if (venue.partyHallAvailable) {
+    const capacity = Number(venue.partyHallCapacity);
+    rows.push({
+      label: "Party / banquet hall",
+      value: capacity > 0 ? `Available · capacity ${capacity}` : "Available",
+    });
+  }
+  if (venue.ambiance) {
+    rows.push({ label: "Ambiance", value: venue.ambiance });
+  }
+  return rows;
 }
 
 function FilterChip({ active, onClick, children }) {
@@ -182,6 +241,7 @@ export default function AdminPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -193,7 +253,7 @@ export default function AdminPage() {
         if (error) {
           const fallback = await client
             .from("restaurants")
-            .select("id, user_id, name, phone, logo_url, created_at, updated_at, is_online")
+            .select("id, user_id, name, phone, logo_url, created_at, updated_at, is_online, venue")
             .order("updated_at", { ascending: false });
 
           if (fallback.error) {
@@ -493,9 +553,21 @@ export default function AdminPage() {
                   <p className="admin-account__empty">No menus yet.</p>
                 ) : (
                   <ul className="admin-menu-list">
-                    {account.menus.map((menu) => (
-                      <li key={menu.id} className="admin-menu">
-                        <div className="admin-menu__top">
+                    {account.menus.map((menu) => {
+                      const open = openMenuId === menu.id;
+                      const details = venueRows(menu.venue);
+                      return (
+                      <li key={menu.id} className={`admin-menu ${open ? "is-open" : ""}`}>
+                        <button
+                          type="button"
+                          className="admin-menu__summary"
+                          onClick={() =>
+                            setOpenMenuId((current) =>
+                              current === menu.id ? null : menu.id,
+                            )
+                          }
+                          aria-expanded={open}
+                        >
                           <div className="admin-menu__identity">
                             <div className="restaurant-card__logo">
                               {menu.logo_url ? (
@@ -521,49 +593,82 @@ export default function AdminPage() {
                               </code>
                             </div>
                           </div>
-                          <MenuQrCode restaurantId={menu.id} restaurantName={menu.name} />
-                        </div>
+                          <ChevronDown className="admin-menu__chevron" />
+                        </button>
 
-                        <div className="admin-menu__actions">
-                          <Link
-                            to={`/menu/${menu.id}`}
-                            className="btn btn--primary btn--sm"
-                          >
-                            <LinkExternal01 />
-                            View
-                          </Link>
-                          <button
-                            type="button"
-                            className="btn btn--ghost btn--sm"
-                            onClick={() => copyMenuLink(menu.id)}
-                          >
-                            <Copy01 />
-                            Copy
-                          </button>
-                          <button
-                            type="button"
-                            className={`btn btn--sm admin-menu__toggle ${menu.is_online === false ? "is-off" : "is-on"}`}
-                            onClick={() => toggleOnline(menu)}
-                            disabled={togglingId === menu.id}
-                            aria-pressed={menu.is_online !== false}
-                          >
-                            {togglingId === menu.id
-                              ? "Updating…"
-                              : menu.is_online === false
-                                ? "Enable"
-                                : "Disable"}
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn--danger btn--sm"
-                            onClick={() => setDeleteTarget({ type: "menu", ...menu })}
-                          >
-                            <Trash01 />
-                            Delete
-                          </button>
-                        </div>
+                        {open ? (
+                          <div className="admin-menu__panel">
+                            <div className="admin-menu__top">
+                              <MenuQrCode restaurantId={menu.id} restaurantName={menu.name} />
+                            </div>
+
+                            <div className="admin-menu__actions">
+                              <Link
+                                to={`/menu/${menu.id}`}
+                                className="btn btn--primary btn--sm"
+                              >
+                                <LinkExternal01 />
+                                View
+                              </Link>
+                              <button
+                                type="button"
+                                className="btn btn--ghost btn--sm"
+                                onClick={() => copyMenuLink(menu.id)}
+                              >
+                                <Copy01 />
+                                Copy
+                              </button>
+                              <button
+                                type="button"
+                                className={`btn btn--sm admin-menu__toggle ${menu.is_online === false ? "is-off" : "is-on"}`}
+                                onClick={() => toggleOnline(menu)}
+                                disabled={togglingId === menu.id}
+                                aria-pressed={menu.is_online !== false}
+                              >
+                                {togglingId === menu.id
+                                  ? "Updating…"
+                                  : menu.is_online === false
+                                    ? "Enable"
+                                    : "Disable"}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn--danger btn--sm"
+                                onClick={() => setDeleteTarget({ type: "menu", ...menu })}
+                              >
+                                <Trash01 />
+                                Delete
+                              </button>
+                            </div>
+
+                            <div className="admin-venue-card">
+                              <h4>Venue details</h4>
+                              {details.length === 0 ? (
+                                <p>No optional venue details added.</p>
+                              ) : (
+                                <dl>
+                                  {details.map((row) => (
+                                    <div key={row.label}>
+                                      <dt>{row.label}</dt>
+                                      <dd>
+                                        {row.href ? (
+                                          <a href={row.href} target="_blank" rel="noreferrer">
+                                            {row.value}
+                                          </a>
+                                        ) : (
+                                          row.value
+                                        )}
+                                      </dd>
+                                    </div>
+                                  ))}
+                                </dl>
+                              )}
+                            </div>
+                          </div>
+                        ) : null}
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 )}
               </li>

@@ -40,6 +40,8 @@ function emptyVenue() {
     fourWheelers: "",
     higherFloor: false,
     elevatorAvailable: false,
+    partyHallAvailable: false,
+    partyHallCapacity: "",
     ambiance: "",
   };
 }
@@ -67,6 +69,11 @@ function normalizeVenue(raw) {
         : "",
     higherFloor: Boolean(raw.higherFloor),
     elevatorAvailable: Boolean(raw.elevatorAvailable),
+    partyHallAvailable: Boolean(raw.partyHallAvailable),
+    partyHallCapacity:
+      raw.partyHallCapacity === 0 || raw.partyHallCapacity
+        ? String(raw.partyHallCapacity)
+        : "",
     ambiance: raw.ambiance || "",
   };
 }
@@ -90,6 +97,11 @@ function venueForSave(venue) {
     elevatorAvailable: venue.higherFloor
       ? Boolean(venue.elevatorAvailable)
       : false,
+    partyHallAvailable: Boolean(venue.partyHallAvailable),
+    partyHallCapacity: venue.partyHallAvailable
+      ? Number(venue.partyHallCapacity) || 0
+      : 0,
+    ambiance: venue.ambiance.trim() || null,
     ambiance: venue.ambiance.trim() || null,
   };
 }
@@ -681,16 +693,64 @@ export default function RestaurantFormPage() {
               )}
             </div>
 
-            <label className="auth-field">
-              <span>Ambiance</span>
-              <textarea
-                value={venue.ambiance}
-                onChange={(e) => updateVenue({ ambiance: e.target.value })}
-                rows={3}
-                placeholder="Beach view, courtyard seating, live music on weekends…"
-                disabled={saving}
-              />
-            </label>
+            <div className="venue-block">
+              <h3>Party / banquet hall</h3>
+              <div
+                className="choice-row"
+                role="group"
+                aria-label="Party or banquet hall available"
+              >
+                <span className="choice-row__label">
+                  Is a party / banquet hall available?
+                </span>
+                <div className="choice-pills">
+                  <button
+                    type="button"
+                    className={!venue.partyHallAvailable ? "is-on" : ""}
+                    onClick={() => updateVenue({ partyHallAvailable: false })}
+                    disabled={saving}
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    className={venue.partyHallAvailable ? "is-on" : ""}
+                    onClick={() => updateVenue({ partyHallAvailable: true })}
+                    disabled={saving}
+                  >
+                    Yes
+                  </button>
+                </div>
+              </div>
+              {venue.partyHallAvailable && (
+                <label className="auth-field">
+                  <span>Capacity</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={venue.partyHallCapacity}
+                    onChange={(e) =>
+                      updateVenue({ partyHallCapacity: e.target.value })
+                    }
+                    placeholder="e.g. 80"
+                    disabled={saving}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="venue-block">
+              <label className="auth-field">
+                <span>Ambiance</span>
+                <textarea
+                  value={venue.ambiance}
+                  onChange={(e) => updateVenue({ ambiance: e.target.value })}
+                  rows={3}
+                  placeholder="Beach view, courtyard seating, live music on weekends…"
+                  disabled={saving}
+                />
+              </label>
+            </div>
           </section>
 
           <section className="form-section">

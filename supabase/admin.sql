@@ -27,7 +27,8 @@ returns table (
   created_at timestamptz,
   updated_at timestamptz,
   owner_email text,
-  is_online boolean
+  is_online boolean,
+  venue jsonb
 )
 language sql
 security definer
@@ -42,7 +43,8 @@ as $$
     r.created_at,
     r.updated_at,
     u.email::text,
-    coalesce(r.is_online, true)
+    coalesce(r.is_online, true),
+    coalesce(r.venue, '{}'::jsonb)
   from auth.users u
   left join public.restaurants r on r.user_id = u.id
   order by u.created_at desc, r.updated_at desc nulls last;

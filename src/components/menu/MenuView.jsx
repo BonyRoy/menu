@@ -51,6 +51,14 @@ function venueLines(venue) {
         : "Higher floor · no elevator",
     );
   }
+  if (venue.partyHallAvailable) {
+    const capacity = Number(venue.partyHallCapacity);
+    lines.push(
+      capacity > 0
+        ? `Party / banquet hall available · capacity ${capacity}`
+        : "Party / banquet hall available",
+    );
+  }
   if (venue.ambiance) lines.push(venue.ambiance);
   return lines;
 }
