@@ -1,9 +1,9 @@
 {
   "restaurant": {
-    "name": "RED CHILLI & SPYYCE FOOD SERVICES",
-    "tagline": "Specialist in Catering Bulk Orders for all Occasion (Birthday, Kiti-Party, Society Function, Pooja, House Warming)",
-    "phone": "9819958246",
-    "address": "SAI WORLD CITY, Shop No. 23, Opp. to Marathon Society, Palaspe, Panvel.",
+    "name": "CHILI & SPYCE",
+    "tagline": "Specialist in Catering Bulk Orders for all Occasion",
+    "phone": "8369877891",
+    "address": "SAI WORLD CITY, Phase 2, Palazzo-406, Palaspe, Panvel.",
     "currency": "INR"
   },
   "menus": {
@@ -133,8 +133,16 @@
           "name": "NON-VEG RICE IN INDIAN",
           "type": "non-veg",
           "items": [
-            { "name": "Chicken Dum Biriyani", "priceHalf": 199, "priceFull": 349 },
-            { "name": "Chicken Tikka Biriyani", "priceHalf": 249, "priceFull": 399 },
+            {
+              "name": "Chicken Dum Biriyani",
+              "priceHalf": 199,
+              "priceFull": 349
+            },
+            {
+              "name": "Chicken Tikka Biriyani",
+              "priceHalf": 249,
+              "priceFull": 399
+            },
             { "name": "Chicken Pulao", "priceHalf": 199, "priceFull": 349 }
           ]
         },
@@ -146,7 +154,11 @@
             { "name": "French Fries", "price": 80, "type": "veg" },
             { "name": "Spring Roll", "price": 120, "type": "veg" },
             { "name": "Veg Momos (steam)", "price": 90, "type": "veg" },
-            { "name": "Chicken Momos (steam)", "price": 120, "type": "non-veg" },
+            {
+              "name": "Chicken Momos (steam)",
+              "price": 120,
+              "type": "non-veg"
+            },
             { "name": "Poha", "price": 40, "type": "veg" },
             { "name": "Paneer Paratha", "price": 120, "type": "veg" },
             { "name": "Aloo Paratha", "price": 80, "type": "veg" },
@@ -180,7 +192,11 @@
               "price": 199,
               "description": "Jeera Rice Or Roti 2 units with any one option from Butter Chicken / Chicken Handi / Chicken Bhuna",
               "baseOptions": ["Jeera Rice", "Roti 2 units"],
-              "curryOptions": ["Butter Chicken", "Chicken Handi", "Chicken Bhuna"]
+              "curryOptions": [
+                "Butter Chicken",
+                "Chicken Handi",
+                "Chicken Bhuna"
+              ]
             }
           ]
         }
