@@ -7,6 +7,7 @@ import {
   MarkerPin01,
   QrCode01,
   Shield01,
+  Stars01,
   XClose,
   Zap,
 } from "@untitledui/icons";
@@ -49,6 +50,15 @@ export default function LandingPage() {
               Login / Sign up
               <ChevronRight />
             </Link>
+            <a
+              href="/sample"
+              className="btn btn--ai"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Stars01 />
+              View sample Menu
+            </a>
           </div>
         </div>
 
