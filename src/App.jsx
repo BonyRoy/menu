@@ -8,6 +8,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import RestaurantFormPage from "./pages/RestaurantFormPage";
 import MenuPage from "./pages/MenuPage";
+import SampleMenuPage from "./pages/SampleMenuPage";
 import AdminPage from "./pages/AdminPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminGate from "./components/AdminGate";
@@ -47,6 +48,7 @@ function App() {
             }
           />
           <Route path="/menu/:uuid" element={<MenuPage />} />
+          <Route path="/sample" element={<SampleMenuPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route
             path="/admin"
