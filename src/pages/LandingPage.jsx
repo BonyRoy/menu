@@ -12,7 +12,10 @@ import {
   Zap,
 } from "@untitledui/icons";
 import { DEFAULT_HERO_IMAGE } from "../lib/supabase";
+import MenuQrCode from "../components/MenuQrCode";
 import "../styles/platform.scss";
+
+const SAMPLE_MENU_URL = "https://menucraftrms.vercel.app/sample";
 
 export default function LandingPage() {
   return (
@@ -50,15 +53,6 @@ export default function LandingPage() {
               Login / Sign up
               <ChevronRight />
             </Link>
-            <a
-              href="/sample"
-              className="btn btn--ai"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Stars01 />
-              View sample Menu
-            </a>
           </div>
         </div>
 
@@ -111,6 +105,30 @@ export default function LandingPage() {
               <li>QR code ready to share</li>
             </ul>
           </article>
+        </div>
+      </section>
+
+      <section className="landing-sample">
+        <div className="landing-sample__copy">
+          <p className="landing-sample__eyebrow">Live demo</p>
+          <h2>See a sample menu in action</h2>
+          <p>
+            Scan the QR with your phone, or open it right here. And yes!! Your
+            menu can look{" "}
+            <span className="landing-sample__this">THIS</span> good too.
+          </p>
+          <a
+            href={SAMPLE_MENU_URL}
+            className="btn btn--ai"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Stars01 />
+            View sample
+          </a>
+        </div>
+        <div className="landing-sample__qr">
+          <MenuQrCode url={SAMPLE_MENU_URL} restaurantName="sample menu" />
         </div>
       </section>
 

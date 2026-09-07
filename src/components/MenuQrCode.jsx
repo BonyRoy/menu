@@ -3,9 +3,14 @@ import { toast } from "react-toastify";
 import QRCode from "qrcode";
 import { Download01 } from "@untitledui/icons";
 
-export default function MenuQrCode({ restaurantId, restaurantName }) {
+export default function MenuQrCode({
+  restaurantId,
+  restaurantName,
+  url,
+}) {
   const [dataUrl, setDataUrl] = useState("");
-  const menuUrl = `${window.location.origin}/menu/${restaurantId}`;
+  const menuUrl =
+    url || `${window.location.origin}/menu/${restaurantId}`;
 
   useEffect(() => {
     let cancelled = false;
