@@ -35,6 +35,17 @@ function parseCoord(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+function isValidLatLng(lat, lng) {
+  return (
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= -90 &&
+    lat <= 90 &&
+    lng >= -180 &&
+    lng <= 180
+  );
+}
+
 function formatCoord(value) {
   return Number(value).toFixed(6);
 }
@@ -47,13 +58,13 @@ function MapSync({ lat, lng }) {
   }, [map]);
 
   useEffect(() => {
-    if (lat == null || lng == null) {
+    if (!isValidLatLng(lat, lng)) {
       map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
       return;
     }
-    map.flyTo([lat, lng], Math.max(map.getZoom(), PICKED_ZOOM), {
-      duration: 0.6,
-    });
+    // setView is deliberately used here instead of flyTo: Leaflet can derive
+    // NaN bounds while a previously hidden map is being resized.
+    map.setView([lat, lng], PICKED_ZOOM);
   }, [lat, lng, map]);
   return null;
 }
@@ -77,7 +88,7 @@ export default function LocationPicker({ lat, lng, onChange, disabled }) {
 
   const parsedLat = parseCoord(lat);
   const parsedLng = parseCoord(lng);
-  const hasPin = parsedLat != null && parsedLng != null;
+  const hasPin = isValidLatLng(parsedLat, parsedLng);
   const position = hasPin ? [parsedLat, parsedLng] : null;
 
   useEffect(() => {
