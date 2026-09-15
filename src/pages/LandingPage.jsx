@@ -5,6 +5,7 @@ import {
   Cloud01,
   Heart,
   MarkerPin01,
+  MessageChatCircle,
   QrCode01,
   Shield01,
   Stars01,
@@ -16,6 +17,7 @@ import MenuQrCode from "../components/MenuQrCode";
 import "../styles/platform.scss";
 
 const SAMPLE_MENU_URL = "https://menucraftrms.vercel.app/sample";
+const WHATSAPP_NUMBER = "919876543210";
 
 export default function LandingPage() {
   return (
@@ -26,6 +28,7 @@ export default function LandingPage() {
           MenuCraft RMS
         </Link>
         <nav className="platform-nav__links">
+          {/* <Link to="/about" className="platform-nav__link">About us</Link> */}
           <Link to="/auth" className="btn btn--primary platform-nav__cta">
             Get started
           </Link>
@@ -141,6 +144,25 @@ export default function LandingPage() {
       </section>
 
       <footer className="landing-footer">
+        <div className="landing-footer__contact">
+          <div>
+            <p className="landing-footer__contact-label">Have a question?</p>
+            <p className="landing-footer__contact-copy">
+              We would love to help you get your digital menu set up.
+            </p>
+          </div>
+          <div className="landing-footer__contact-links">
+            <a
+              className="landing-footer__whatsapp"
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageChatCircle aria-hidden="true" />
+              <span>+91 98765 43210</span>
+            </a>
+          </div>
+        </div>
         <div className="landing-footer__values">
           <span>
             <Shield01 /> Secure & reliable

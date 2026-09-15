@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
+import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import RestaurantFormPage from "./pages/RestaurantFormPage";
@@ -20,6 +21,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/auth" element={<LoginPage />} />
           <Route path="/login" element={<Navigate to="/auth" replace />} />
           <Route path="/signup" element={<Navigate to="/auth" replace />} />
