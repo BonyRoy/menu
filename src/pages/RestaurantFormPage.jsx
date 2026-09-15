@@ -441,16 +441,6 @@ export default function RestaurantFormPage() {
           <button type="button" className={activeTab === "menu" ? "is-active" : ""} onClick={() => setActiveTab("menu")}><span className="tab-cutlery">✦</span> Menu</button>
           <button type="button" className={activeTab === "settings" ? "is-active" : ""} onClick={() => setActiveTab("settings")}><Settings01 /> Settings</button>
         </nav>
-        <label className="form-search">
-          <SearchMd />
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search dishes, sections, categories…"
-            disabled={saving}
-          />
-        </label>
       </header>
 
       <main className="form-main form-main--with-bar">
@@ -900,6 +890,17 @@ export default function RestaurantFormPage() {
               Add categories (Indian, Chinese…), sections, and dishes. Use
               dropdowns for veg / non-veg / both and single or half-full prices.
             </p>
+            <label className="menu-search">
+              <SearchMd aria-hidden="true" />
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search dishes, sections, or categories…"
+                disabled={saving}
+                aria-label="Search menu"
+              />
+            </label>
             <MenuBuilder
               value={menuBuilder}
               onChange={setMenuBuilder}

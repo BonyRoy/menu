@@ -2040,8 +2040,6 @@
   backdrop-filter: blur(10px);
 }
 
-.restaurant-editor-header > .form-search { display: none; }
-
 .form-search {
   flex: 1;
   display: flex;
@@ -2069,6 +2067,44 @@
     color: var(--ink);
     outline: none;
   }
+}
+
+.menu-search {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: min(100%, 34rem);
+  margin-top: 1rem;
+  padding: 0.62rem 0.8rem;
+  border: 1px solid #d7deea;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+
+  &:focus-within {
+    border-color: var(--chilli);
+    box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.12);
+  }
+
+  > svg {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+    color: #667085;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #172b4d;
+    font: 500 0.8rem var(--font-body);
+
+    &::placeholder { color: #98a2b3; }
+  }
+
 }
 
 .form-sticky-actions {
