@@ -105,6 +105,44 @@ $$;
 
 grant execute on function public.admin_set_menu_online(uuid, boolean) to anon, authenticated;
 
+-- Used by the admin editor for the images and raw menu JSON.
+drop function if exists public.admin_update_restaurant(uuid, text, text, jsonb);
+create or replace function public.admin_update_restaurant(
+  p_restaurant_id uuid,
+  p_logo_url text,
+  p_hero_image_url text,
+  p_menu_data jsonb,
+  p_restaurant_data jsonb
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.restaurants
+  set
+    logo_url = p_logo_url,
+    hero_image_url = p_hero_image_url,
+    menu_data = p_menu_data,
+    name = coalesce(p_restaurant_data->>'name', name),
+    tagline = p_restaurant_data->>'tagline',
+    phone = coalesce(p_restaurant_data->>'phone', phone),
+    address = p_restaurant_data->>'address',
+    currency = coalesce(p_restaurant_data->>'currency', currency),
+    theme = coalesce(p_restaurant_data->'theme', theme),
+    venue = coalesce(p_restaurant_data->'venue', venue),
+    is_online = coalesce((p_restaurant_data->>'is_online')::boolean, is_online)
+  where id = p_restaurant_id;
+
+  if not found then
+    raise exception 'Restaurant not found';
+  end if;
+end;
+$$;
+
+grant execute on function public.admin_update_restaurant(uuid, text, text, jsonb, jsonb) to anon, authenticated;
+
 drop function if exists public.admin_delete_account(uuid);
 create or replace function public.admin_delete_account(target_user_id uuid)
 returns void

@@ -12,6 +12,7 @@ import MenuPage from "./pages/MenuPage";
 import SampleMenuPage from "./pages/SampleMenuPage";
 import AdminPage from "./pages/AdminPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminRestaurantEditPage from "./pages/AdminRestaurantEditPage";
 import AdminGate from "./components/AdminGate";
 import "./styles/platform.scss";
 
@@ -57,6 +58,14 @@ function App() {
             element={
               <AdminGate>
                 <AdminPage />
+              </AdminGate>
+            }
+          />
+          <Route
+            path="/admin/restaurants/:id/edit"
+            element={
+              <AdminGate>
+                <AdminRestaurantEditPage />
               </AdminGate>
             }
           />

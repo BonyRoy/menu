@@ -618,6 +618,12 @@ export default function AdminPage() {
                                 <Copy01 />
                                 Copy
                               </button>
+                              <Link
+                                to={`/admin/restaurants/${menu.id}/edit`}
+                                className="btn btn--ghost btn--sm"
+                              >
+                                Edit
+                              </Link>
                               <button
                                 type="button"
                                 className={`btn btn--sm admin-menu__toggle ${menu.is_online === false ? "is-off" : "is-on"}`}
