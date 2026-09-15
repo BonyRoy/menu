@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { SearchMd, Upload01, XClose } from "@untitledui/icons";
+import { ArrowLeft, Eye, Home01, Image01, MarkerPin01, Save01, SearchMd, Settings01, Upload01, XClose } from "@untitledui/icons";
 import { useAuth } from "../context/AuthContext";
 import {
   DEFAULT_HERO_IMAGE,
@@ -102,7 +102,6 @@ function venueForSave(venue) {
       ? Number(venue.partyHallCapacity) || 0
       : 0,
     ambiance: venue.ambiance.trim() || null,
-    ambiance: venue.ambiance.trim() || null,
   };
 }
 
@@ -155,6 +154,7 @@ export default function RestaurantFormPage() {
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [themeId, setThemeId] = useState(DEFAULT_THEME.id);
   const [venue, setVenue] = useState(() => emptyVenue());
+  const [activeTab, setActiveTab] = useState("basic-info");
 
   useEffect(() => {
     if (isEdit) return;
@@ -419,7 +419,28 @@ export default function RestaurantFormPage() {
         </div>
       )}
 
-      <header className="form-sticky-top">
+      <header className="restaurant-editor-header">
+        <button type="button" className="editor-back" onClick={handleBack} disabled={saving}>
+          <ArrowLeft /> <span>Restaurants</span>
+        </button>
+        <div className="editor-heading">
+          <div>
+            <h1>{isEdit ? "Edit Restaurant" : "Create Restaurant"}</h1>
+            <p>Update your restaurant details, menu, photos and more.</p>
+          </div>
+          <div className="editor-actions">
+            <span className="save-status"><i /> {isDirty ? "Unsaved changes" : "All changes saved"}</span>
+            {isEdit && <button type="button" className="editor-preview" onClick={() => navigate(`/menu/${id}`)}><Eye /> Preview</button>}
+            <button type="submit" form="restaurant-form" className="editor-save" disabled={saving || !isDirty}><Save01 /> <SpinnerButton loading={saving}>{saving ? "Saving…" : "Save Changes"}</SpinnerButton></button>
+          </div>
+        </div>
+        <nav className="editor-tabs" aria-label="Restaurant form sections">
+          <button type="button" className={activeTab === "basic-info" ? "is-active" : ""} onClick={() => setActiveTab("basic-info")}><Home01 /> Basic Info</button>
+          <button type="button" className={activeTab === "location" ? "is-active" : ""} onClick={() => setActiveTab("location")}><MarkerPin01 /> Location</button>
+          <button type="button" className={activeTab === "branding" ? "is-active" : ""} onClick={() => setActiveTab("branding")}><Image01 /> Branding</button>
+          <button type="button" className={activeTab === "menu" ? "is-active" : ""} onClick={() => setActiveTab("menu")}><span className="tab-cutlery">✦</span> Menu</button>
+          <button type="button" className={activeTab === "settings" ? "is-active" : ""} onClick={() => setActiveTab("settings")}><Settings01 /> Settings</button>
+        </nav>
         <label className="form-search">
           <SearchMd />
           <input
@@ -443,9 +464,25 @@ export default function RestaurantFormPage() {
           id="restaurant-form"
           className="restaurant-form"
           onSubmit={handleSubmit}
+          data-active-tab={activeTab}
         >
-          <section className="form-section">
-            <h2>Restaurant details</h2>
+          <aside className="editor-live-preview" aria-label="Live restaurant preview">
+            <div className="live-preview__head"><span><Eye /> Live Preview</span><button type="button" onClick={() => isEdit && navigate(`/menu/${id}`)}>↗</button></div>
+            <div className="live-preview__cover">
+              {heroPreview ? <img src={heroPreview} alt="Restaurant cover preview" /> : <span>Cover image preview</span>}
+            </div>
+            <div className="live-preview__identity">
+              <div className="live-preview__logo">{logoPreview ? <img src={logoPreview} alt="Restaurant logo" /> : (form.name.trim().slice(0, 1) || "R")}</div>
+              <div><h3>{form.name || "Your Restaurant"}</h3><p>★ 4.5 <span>(320 reviews)</span></p></div>
+            </div>
+            <p className="live-preview__tagline">{form.tagline || "Your restaurant description will appear here."}</p>
+            <p className="live-preview__address"><MarkerPin01 /> {form.address || "Add your restaurant location"}</p>
+            <div className="live-preview__tabs"><b>Menu</b><span>About</span><span>Photos</span></div>
+            <h4>Popular Dishes</h4>
+            <div className="live-preview__dishes"><span>Featured menu items will appear here</span></div>
+          </aside>
+          <section className="form-section" id="basic-info">
+            <div className="section-title"><span><Home01 /></span><div><h2>Restaurant Information</h2><p>Tell us about your restaurant.</p></div></div>
             <div className="form-grid">
               <label className="auth-field form-field--wide">
                 <span>Restaurant name *</span>
@@ -498,8 +535,8 @@ export default function RestaurantFormPage() {
             </div>
           </section>
 
-          <section className="form-section">
-            <h2>Optional venue details</h2>
+          <section className="form-section" id="location">
+            <div className="section-title"><span><MarkerPin01 /></span><div><h2>Location & venue details</h2><p>Help guests find and enjoy your restaurant.</p></div></div>
             <p className="form-hint">
               Add location, seating, parking, and ambiance if you want guests
               to see them on the public menu. Skip anything that does not apply.
@@ -753,8 +790,8 @@ export default function RestaurantFormPage() {
             </div>
           </section>
 
-          <section className="form-section">
-            <h2>Images</h2>
+          <section className="form-section" id="branding">
+            <div className="section-title"><span><Image01 /></span><div><h2>Branding</h2><p>Add your logo and cover image.</p></div></div>
             <div className="form-uploads">
               <label className="upload-card">
                 <span>Logo</span>
@@ -808,8 +845,8 @@ export default function RestaurantFormPage() {
             </p>
           </section>
 
-          <section className="form-section">
-            <h2>Theme</h2>
+          <section className="form-section" id="settings">
+            <div className="section-title"><span><Settings01 /></span><div><h2>Theme</h2><p>Set the visual style of your public menu.</p></div></div>
             <p className="form-hint">
               Pick a look for your public menu — background and highlight
               colors.
@@ -857,8 +894,8 @@ export default function RestaurantFormPage() {
             </div>
           </section>
 
-          <section className="form-section">
-            <h2>Menu</h2>
+          <section className="form-section" id="menu">
+            <div className="section-title"><span>✦</span><div><h2>Menu</h2><p>Manage your restaurant's menu items.</p></div></div>
             <p className="form-hint">
               Add categories (Indian, Chinese…), sections, and dishes. Use
               dropdowns for veg / non-veg / both and single or half-full prices.
