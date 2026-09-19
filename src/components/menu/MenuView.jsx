@@ -217,7 +217,10 @@ export default function MenuView({ restaurant, menus }) {
   };
 
   const callHref = `tel:${restaurant.phone}`;
-  const whatsappHref = `https://wa.me/91${restaurant.phone.replace(/\D/g, "")}`;
+  const whatsappNumber = restaurant.whatsapp || restaurant.phone;
+  const whatsappHref = `https://wa.me/91${whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+    "Hello! I'd like to place an order or enquire about catering.",
+  )}`;
 
   if (!activeMenu) {
     return (

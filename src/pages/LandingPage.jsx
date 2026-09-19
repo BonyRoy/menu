@@ -17,7 +17,7 @@ import MenuQrCode from "../components/MenuQrCode";
 import "../styles/platform.scss";
 
 const SAMPLE_MENU_URL = "https://menucraftrms.vercel.app/sample";
-const WHATSAPP_NUMBER = "919876543210";
+const WHATSAPP_NUMBER = "917021728458";
 
 export default function LandingPage() {
   return (
@@ -117,8 +117,8 @@ export default function LandingPage() {
           <h2>See a sample menu in action</h2>
           <p>
             Scan the QR with your phone, or open it right here. And yes!! Your
-            menu can look{" "}
-            <span className="landing-sample__this">THIS</span> good too.
+            menu can look <span className="landing-sample__this">THIS</span>{" "}
+            good too.
           </p>
           <a
             href={SAMPLE_MENU_URL}
@@ -154,12 +154,14 @@ export default function LandingPage() {
           <div className="landing-footer__contact-links">
             <a
               className="landing-footer__whatsapp"
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                "Hello! I'd like to know more about your services.",
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
             >
               <MessageChatCircle aria-hidden="true" />
-              <span>+91 98765 43210</span>
+              <span>+91 70217 28458</span>
             </a>
           </div>
         </div>
