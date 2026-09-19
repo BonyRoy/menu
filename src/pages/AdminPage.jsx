@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Copy01, ChevronDown, LinkExternal01, LogOut01, SearchMd, Trash01, XClose } from "@untitledui/icons";
+import { Copy01, ChevronDown, LinkExternal01, LogOut01, Plus, SearchMd, Trash01, XClose } from "@untitledui/icons";
 import { requireSupabase } from "../lib/supabase";
 import { clearAdminSession, getAdminSession, setAdminSession } from "../lib/adminSession";
 import Spinner, { SpinnerButton } from "../components/Spinner";
@@ -242,6 +242,10 @@ export default function AdminPage() {
   const [deleting, setDeleting] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [newMenuAccount, setNewMenuAccount] = useState(null);
+  const [newMenuName, setNewMenuName] = useState("");
+  const [newMenuPhone, setNewMenuPhone] = useState("");
+  const [creatingMenu, setCreatingMenu] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -358,6 +362,43 @@ export default function AdminPage() {
       toast.success("Menu link copied");
     } catch {
       toast.error("Could not copy link");
+    }
+  };
+
+  const openNewMenu = (account) => {
+    setNewMenuAccount(account);
+    setNewMenuName("");
+    setNewMenuPhone("");
+  };
+
+  const createMenu = async (event) => {
+    event.preventDefault();
+    if (!newMenuAccount || creatingMenu) return;
+
+    const name = newMenuName.trim();
+    const phone = newMenuPhone.trim();
+    if (!name || !phone) {
+      toast.error("Restaurant name and phone are required.");
+      return;
+    }
+
+    setCreatingMenu(true);
+    try {
+      const { data, error } = await requireSupabase().rpc("admin_create_restaurant", {
+        p_user_id: newMenuAccount.userId,
+        p_name: name,
+        p_phone: phone,
+      });
+      if (error) throw error;
+      if (!data) throw new Error("The new menu could not be created.");
+
+      toast.success("Menu created. Add its details below.");
+      setNewMenuAccount(null);
+      navigate(`/admin/restaurants/${data}/edit`);
+    } catch (err) {
+      toast.error(err.message || "Could not create menu");
+    } finally {
+      setCreatingMenu(false);
     }
   };
 
@@ -538,6 +579,14 @@ export default function AdminPage() {
                     <span className="admin-account__count">
                       {account.menus.length} menu{account.menus.length === 1 ? "" : "s"}
                     </span>
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--sm admin-account__add-menu"
+                      onClick={() => openNewMenu(account)}
+                    >
+                      <Plus />
+                      Add menu
+                    </button>
                     <button
                       type="button"
                       className="admin-menu__delete"
@@ -743,6 +792,67 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {newMenuAccount && (
+        <div className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="admin-new-menu-title">
+          <button
+            type="button"
+            className="confirm-modal__backdrop"
+            aria-label="Close"
+            onClick={() => !creatingMenu && setNewMenuAccount(null)}
+          />
+          <form className="confirm-modal__panel admin-new-menu" onSubmit={createMenu}>
+            <div className="confirm-modal__head">
+              <h2 id="admin-new-menu-title">Add a menu</h2>
+              <button
+                type="button"
+                className="confirm-modal__close"
+                onClick={() => setNewMenuAccount(null)}
+                disabled={creatingMenu}
+                aria-label="Close"
+              >
+                <XClose />
+              </button>
+            </div>
+            <p className="confirm-modal__text">
+              Create a menu for <strong>{newMenuAccount.email || newMenuAccount.userId}</strong>.
+              You can add the full menu, images, and restaurant details next.
+            </p>
+            <label className="auth-field">
+              <span>Restaurant name *</span>
+              <input
+                autoFocus
+                value={newMenuName}
+                onChange={(event) => setNewMenuName(event.target.value)}
+                placeholder="e.g. Red Chilli & Spyyce"
+                disabled={creatingMenu}
+                required
+              />
+            </label>
+            <label className="auth-field">
+              <span>Phone *</span>
+              <input
+                type="tel"
+                value={newMenuPhone}
+                onChange={(event) => setNewMenuPhone(event.target.value)}
+                placeholder="e.g. 9819958246"
+                disabled={creatingMenu}
+                required
+              />
+            </label>
+            <div className="confirm-modal__actions">
+              <button type="button" className="btn btn--ghost" onClick={() => setNewMenuAccount(null)} disabled={creatingMenu}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn--primary" disabled={creatingMenu}>
+                <SpinnerButton loading={creatingMenu}>
+                  {creatingMenu ? "Creating…" : "Create menu"}
+                </SpinnerButton>
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

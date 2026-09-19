@@ -79,6 +79,18 @@ Your local `.env` file is **not** uploaded to Vercel. Vite reads `VITE_*` variab
 
 Without a redeploy after adding env vars, the live site will still show "Supabase is not configured."
 
+### Admin image uploads
+
+The admin image editor uses a secure Supabase Edge Function. It verifies a short-lived upload token created by the existing admin-password check, then writes with the server-only Supabase service-role key. This allows an admin to update any restaurant's logo or cover image without loosening the `restaurant-assets` Storage policies.
+
+After running `supabase/admin.sql` in the Supabase SQL Editor, deploy the function from the project root:
+
+```bash
+supabase functions deploy admin-upload-asset --no-verify-jwt
+```
+
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are supplied automatically to deployed Supabase Edge Functions. Sign out and sign in to `/admin` once after deploying so the browser receives a fresh upload token.
+
 ## Tech stack
 
 - React 19 + Vite

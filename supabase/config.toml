@@ -1,0 +1,2 @@
+[functions.admin-upload-asset]
+verify_jwt = false

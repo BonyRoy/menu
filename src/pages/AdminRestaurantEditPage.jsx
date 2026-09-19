@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ArrowLeft, Save01, SearchMd, Upload01 } from "@untitledui/icons";
-import { requireSupabase, uploadRestaurantAsset } from "../lib/supabase";
+import { requireSupabase, uploadAdminRestaurantAsset } from "../lib/supabase";
+import { getAdminSession } from "../lib/adminSession";
 import Spinner, { SpinnerButton } from "../components/Spinner";
 import "../styles/platform.scss";
 
@@ -152,13 +153,18 @@ export default function AdminRestaurantEditPage() {
 
     setSaving(true);
     try {
+      const uploadToken = getAdminSession()?.uploadToken;
       let logoUrl = restaurant.logo_url;
       let heroUrl = restaurant.hero_image_url;
       if (logoFile) {
-        logoUrl = await uploadRestaurantAsset(restaurant.user_id, restaurant.id, logoFile, "logo");
+        logoUrl = await uploadAdminRestaurantAsset(
+          restaurant.user_id, restaurant.id, logoFile, "logo", uploadToken,
+        );
       }
       if (heroFile) {
-        heroUrl = await uploadRestaurantAsset(restaurant.user_id, restaurant.id, heroFile, "hero");
+        heroUrl = await uploadAdminRestaurantAsset(
+          restaurant.user_id, restaurant.id, heroFile, "hero", uploadToken,
+        );
       }
 
       const client = requireSupabase();

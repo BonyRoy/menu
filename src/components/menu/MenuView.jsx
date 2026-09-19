@@ -31,8 +31,19 @@ function WhatsAppIcon() {
 
 export default function MenuView({ restaurant, menus }) {
   const menuEntries = useMemo(() => getMenuEntries(menus), [menus]);
+  const allMenu = useMemo(
+    () => ({
+      title: "All",
+      sections: menuEntries.flatMap(([, menu]) => menu.sections || []),
+    }),
+    [menuEntries],
+  );
   const [cuisine, setCuisine] = useState(
-    () => getMenuEntries(menus)[0]?.[0] || "indian",
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 899px)").matches
+        ? "all"
+        : getMenuEntries(menus)[0]?.[0] || "indian",
   );
   const [dietFilter, setDietFilter] = useState("all");
   const [activeSection, setActiveSection] = useState("");
@@ -65,7 +76,10 @@ export default function MenuView({ restaurant, menus }) {
         )}`
       : null;
 
-  const activeMenu = getMenuByKey(menus, cuisine) || menuEntries[0]?.[1];
+  const activeMenu =
+    cuisine === "all"
+      ? allMenu
+      : getMenuByKey(menus, cuisine) || menuEntries[0]?.[1];
 
   const getStickyOffset = () => {
     const chromeH = chromeRef.current?.offsetHeight ?? 56;
@@ -105,7 +119,11 @@ export default function MenuView({ restaurant, menus }) {
   }, [activeMenu, dietFilter]);
 
   useEffect(() => {
-    if (menuEntries.length && !getMenuByKey(menus, cuisine)) {
+    if (
+      menuEntries.length &&
+      cuisine !== "all" &&
+      !getMenuByKey(menus, cuisine)
+    ) {
       setCuisine(menuEntries[0][0]);
     }
   }, [menus, cuisine, menuEntries]);
@@ -383,10 +401,13 @@ export default function MenuView({ restaurant, menus }) {
                   className="cuisine-select__field"
                   value={cuisine}
                   onChange={setCuisine}
-                  options={menuEntries.map(([key, value]) => ({
-                    value: key,
-                    label: value.title,
-                  }))}
+                  options={[
+                    { value: "all", label: "Everything" },
+                    ...menuEntries.map(([key, value]) => ({
+                      value: key,
+                      label: value.title,
+                    })),
+                  ]}
                   placeholder="Select category"
                 />
               </div>

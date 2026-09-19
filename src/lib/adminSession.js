@@ -11,8 +11,11 @@ export function getAdminSession() {
   }
 }
 
-export function setAdminSession(loginId) {
-  sessionStorage.setItem(KEY, JSON.stringify({ loginId, at: Date.now() }));
+export function setAdminSession(loginId, uploadToken = "") {
+  sessionStorage.setItem(
+    KEY,
+    JSON.stringify({ loginId, uploadToken, at: Date.now() }),
+  );
 }
 
 export function clearAdminSession() {

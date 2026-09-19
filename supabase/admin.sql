@@ -143,6 +143,52 @@ $$;
 
 grant execute on function public.admin_update_restaurant(uuid, text, text, jsonb, jsonb) to anon, authenticated;
 
+-- Creates a blank menu for an existing account. The admin UI redirects to the
+-- editor afterwards so the restaurant details, images, and menu can be added.
+drop function if exists public.admin_create_restaurant(uuid, text, text);
+create or replace function public.admin_create_restaurant(
+  p_user_id uuid,
+  p_name text,
+  p_phone text
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  new_restaurant_id uuid;
+begin
+  if not exists (select 1 from auth.users where id = p_user_id) then
+    raise exception 'Account not found';
+  end if;
+
+  if length(trim(coalesce(p_name, ''))) = 0 then
+    raise exception 'Restaurant name is required';
+  end if;
+
+  if length(trim(coalesce(p_phone, ''))) = 0 then
+    raise exception 'Phone is required';
+  end if;
+
+  insert into public.restaurants (user_id, name, phone, menu_data, theme, venue, is_online)
+  values (
+    p_user_id,
+    trim(p_name),
+    trim(p_phone),
+    '{}'::jsonb,
+    '{"id":"classic-chilli"}'::jsonb,
+    '{}'::jsonb,
+    true
+  )
+  returning id into new_restaurant_id;
+
+  return new_restaurant_id;
+end;
+$$;
+
+grant execute on function public.admin_create_restaurant(uuid, text, text) to anon, authenticated;
+
 drop function if exists public.admin_delete_account(uuid);
 create or replace function public.admin_delete_account(target_user_id uuid)
 returns void
@@ -170,6 +216,28 @@ create table if not exists public.admin_credentials (
 alter table public.admin_credentials enable row level security;
 revoke all on table public.admin_credentials from anon, authenticated;
 
+-- Short-lived bearer tokens used only by the admin image-upload Edge Function.
+-- The browser never receives the Supabase service-role key.
+create table if not exists public.admin_upload_sessions (
+  token uuid primary key default extensions.gen_random_uuid(),
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
+-- `create table if not exists` does not repair an earlier version of this
+-- table, so set the default explicitly for existing installations too.
+alter table public.admin_upload_sessions
+  alter column token set default extensions.gen_random_uuid();
+
+alter table public.admin_upload_sessions enable row level security;
+revoke all on table public.admin_upload_sessions from anon, authenticated;
+-- The Edge Function uses the server-only service role to validate tokens.
+-- Browser roles remain unable to read or write this table.
+grant select, insert, delete on table public.admin_upload_sessions to service_role;
+-- The upload function confirms the target restaurant belongs to the supplied
+-- owner before issuing a signed Storage upload URL.
+grant select on table public.restaurants to service_role;
+
 insert into public.admin_credentials (login_id, password_hash)
 select '8369877891', extensions.crypt('Isha@090404', extensions.gen_salt('bf'))
 where not exists (select 1 from public.admin_credentials);
@@ -186,6 +254,37 @@ as $$
     where login_id = p_login_id
       and password_hash = extensions.crypt(p_password, password_hash)
   );
+$$;
+
+create or replace function public.admin_create_upload_session(
+  p_login_id text,
+  p_password text
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  upload_token uuid;
+begin
+  if not exists (
+    select 1
+    from public.admin_credentials
+    where login_id = trim(p_login_id)
+      and password_hash = extensions.crypt(p_password, password_hash)
+  ) then
+    raise exception 'Invalid admin credentials';
+  end if;
+
+  delete from public.admin_upload_sessions where expires_at < now();
+
+  insert into public.admin_upload_sessions (token, expires_at)
+  values (extensions.gen_random_uuid(), now() + interval '2 hours')
+  returning token into upload_token;
+
+  return upload_token;
+end;
 $$;
 
 create or replace function public.admin_get_login_id()
@@ -236,6 +335,7 @@ end;
 $$;
 
 grant execute on function public.admin_login(text, text) to anon, authenticated;
+grant execute on function public.admin_create_upload_session(text, text) to anon, authenticated;
 grant execute on function public.admin_get_login_id() to anon, authenticated;
 grant execute on function public.admin_update_credentials(text, text, text) to anon, authenticated;
 

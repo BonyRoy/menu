@@ -1363,6 +1363,8 @@
     align-items: center;
     gap: 0.65rem;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   &__count {
@@ -1377,6 +1379,24 @@
     padding: 1.1rem 1.25rem;
     color: var(--ink-soft);
     font-size: 0.95rem;
+  }
+
+  &__add-menu {
+    white-space: nowrap;
+  }
+}
+
+.admin-new-menu {
+  display: grid;
+  gap: 1rem;
+
+  .auth-field input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .confirm-modal__actions {
+    margin-top: 0.15rem;
   }
 }
 

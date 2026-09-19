@@ -44,3 +44,48 @@ export async function uploadRestaurantAsset(userId, restaurantId, file, kind) {
   // URL. Otherwise a browser or the storage CDN can keep showing the old image.
   return `${data.publicUrl}?v=${Date.now()}`;
 }
+
+/** Uploads an asset through the server-side admin endpoint. */
+export async function uploadAdminRestaurantAsset(userId, restaurantId, file, kind, uploadToken) {
+  if (!uploadToken) {
+    throw new Error("Your admin session has expired. Please sign in again.");
+  }
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Please choose an image file.");
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("Choose an image smaller than 5 MB.");
+  }
+
+  const client = requireSupabase();
+  const { data, error } = await client.functions.invoke("admin-upload-asset", {
+    body: { userId, restaurantId, kind, fileType: file.type },
+    headers: { "x-admin-upload-token": uploadToken },
+  });
+
+  if (error) {
+    if (error.name === "FunctionsFetchError") {
+      throw new Error(
+        "Admin image upload is not deployed yet. Deploy the admin-upload-asset Supabase Edge Function, then sign in again.",
+      );
+    }
+    if (error.context instanceof Response) {
+      const body = await error.context.json().catch(() => null);
+      if (body?.error) throw new Error(body.error);
+    }
+    throw error;
+  }
+  if (!data?.path || !data?.token) {
+    throw new Error("The admin upload did not return a signed upload URL.");
+  }
+
+  const { error: uploadError } = await client.storage
+    .from("restaurant-assets")
+    .uploadToSignedUrl(data.path, data.token, file, { contentType: file.type });
+  if (uploadError) throw uploadError;
+
+  const { data: publicUrl } = client.storage
+    .from("restaurant-assets")
+    .getPublicUrl(data.path);
+  return `${publicUrl.publicUrl}?v=${Date.now()}`;
+}

@@ -19,7 +19,8 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await requireSupabase().rpc("admin_login", {
+      const client = requireSupabase();
+      const { data, error } = await client.rpc("admin_login", {
         p_login_id: loginId.trim(),
         p_password: password,
       });
@@ -34,7 +35,16 @@ export default function AdminLoginPage() {
         return;
       }
 
-      setAdminSession(loginId.trim());
+      const { data: uploadToken, error: tokenError } = await client.rpc(
+        "admin_create_upload_session",
+        { p_login_id: loginId.trim(), p_password: password },
+      );
+      if (tokenError || !uploadToken) {
+        toast.error(tokenError?.message || "Could not create a secure admin upload session. Run supabase/admin.sql.");
+        return;
+      }
+
+      setAdminSession(loginId.trim(), uploadToken);
       toast.success("Signed in to admin");
       navigate("/admin", { replace: true });
     } catch (err) {
