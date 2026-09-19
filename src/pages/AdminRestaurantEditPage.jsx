@@ -75,6 +75,11 @@ export default function AdminRestaurantEditPage() {
   const selectImage = (kind) => (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file.");
+      event.target.value = "";
+      return;
+    }
     const url = URL.createObjectURL(file);
     objectUrls.current.push(url);
     if (kind === "logo") {
@@ -84,6 +89,8 @@ export default function AdminRestaurantEditPage() {
       setHeroFile(file);
       setHeroPreview(url);
     }
+    // Permit selecting the same file again after changing their mind.
+    event.target.value = "";
   };
 
   const searchMatches = (() => {
@@ -277,12 +284,12 @@ export default function AdminRestaurantEditPage() {
               <label className="admin-json-field">
                 <span>Restaurant details JSON</span>
                 <small>Includes location, contact details, venue data, theme, and visibility.</small>
-                <textarea ref={jsonTextarea} value={detailsJson} onChange={(event) => { setDetailsJson(event.target.value); setActiveMatch(0); }} spellCheck="false" disabled={saving} />
+                <textarea ref={jsonTextarea} className="admin-json-field__editor" data-json-editor="true" value={detailsJson} onChange={(event) => { setDetailsJson(event.target.value); setActiveMatch(0); }} spellCheck="false" disabled={saving} />
               </label>
             ) : (
               <label className="admin-json-field">
                 <span>Menu JSON</span>
-                <textarea ref={jsonTextarea} value={menuJson} onChange={(event) => { setMenuJson(event.target.value); setActiveMatch(0); }} spellCheck="false" disabled={saving} />
+                <textarea ref={jsonTextarea} className="admin-json-field__editor" data-json-editor="true" value={menuJson} onChange={(event) => { setMenuJson(event.target.value); setActiveMatch(0); }} spellCheck="false" disabled={saving} />
               </label>
             )}
           </section>

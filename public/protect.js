@@ -10,7 +10,13 @@
     return;
   }
 
+  const isJsonEditor = (target) =>
+    target instanceof Element && Boolean(target.closest("[data-json-editor='true']"));
+
   const block = (e) => {
+    // The admin JSON editors deliberately remain editable, including clipboard
+    // actions. Everything else on the public site stays protected.
+    if (isJsonEditor(e.target) && ["copy", "cut", "paste"].includes(e.type)) return;
     e.preventDefault();
     return false;
   };
@@ -28,6 +34,9 @@
       const key = e.key?.toLowerCase();
       const ctrl = e.ctrlKey || e.metaKey;
       const shift = e.shiftKey;
+      const isClipboardShortcut = ctrl && ["c", "x", "v"].includes(key);
+
+      if (isClipboardShortcut && isJsonEditor(e.target)) return;
 
       if (
         key === "f12" ||

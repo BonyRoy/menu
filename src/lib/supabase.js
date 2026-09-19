@@ -40,5 +40,7 @@ export async function uploadRestaurantAsset(userId, restaurantId, file, kind) {
   if (uploadError) throw uploadError;
 
   const { data } = client.storage.from("restaurant-assets").getPublicUrl(path);
-  return data.publicUrl;
+  // The asset path stays stable, so give each successful replacement a distinct
+  // URL. Otherwise a browser or the storage CDN can keep showing the old image.
+  return `${data.publicUrl}?v=${Date.now()}`;
 }
