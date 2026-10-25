@@ -2623,6 +2623,229 @@
   }
 }
 
+.settings-subhead {
+  margin: 1.5rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+
+  &:first-of-type {
+    margin-top: 0.35rem;
+  }
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.layout-card {
+  appearance: none;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--chilli) 45%, var(--line));
+    transform: translateY(-1px);
+  }
+
+  &.is-active {
+    border-color: var(--chilli);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--chilli) 18%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0 0.15rem 0.1rem;
+  }
+
+  &__name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  &__desc {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--ink-soft);
+  }
+}
+
+.menu-layout-preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.55rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #000 6%, transparent);
+  min-height: 108px;
+  overflow: hidden;
+
+  &__hero {
+    height: 28px;
+    border-radius: 6px;
+    opacity: 0.9;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    flex: 1;
+  }
+
+  &__bar {
+    height: 10px;
+    border-radius: 3px;
+    width: 42%;
+  }
+
+  &__line {
+    display: block;
+    height: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, #000 14%, transparent);
+    width: 100%;
+
+    &.short {
+      width: 62%;
+    }
+
+    &.center {
+      margin-inline: auto;
+      width: 78%;
+    }
+
+    &.center.short {
+      width: 48%;
+    }
+
+    &.light {
+      background: rgba(244, 239, 230, 0.22);
+    }
+  }
+
+  &--noir {
+    background: #0c0a09;
+    padding: 0.45rem;
+  }
+
+  &__noir-frame {
+    flex: 1;
+    border: 1px solid #c9a227;
+    border-radius: 2px;
+    padding: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    box-shadow: inset 0 0 0 3px rgba(201, 162, 39, 0.12);
+  }
+
+  &__gold-bar {
+    height: 10px;
+    background: linear-gradient(90deg, #c9a227, #a8841a);
+    border-radius: 2px;
+    width: 100%;
+
+    &.dim {
+      opacity: 0.7;
+      width: 70%;
+    }
+  }
+
+  &--photo {
+    flex-direction: row;
+    gap: 0.4rem;
+    background: #221a15;
+    padding: 0.4rem;
+  }
+
+  &__photo-col {
+    width: 38%;
+    border-radius: 6px;
+    min-height: 92px;
+    opacity: 0.85;
+  }
+
+  &__list-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    justify-content: center;
+    padding-right: 0.15rem;
+
+    .menu-layout-preview__line {
+      background: rgba(255, 255, 255, 0.28);
+    }
+  }
+
+  &--minimal {
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    text-align: center;
+  }
+
+  &__serif {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.78rem;
+    font-style: italic;
+    letter-spacing: 0.08em;
+    color: #44403c;
+  }
+
+  &__leaf {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid color-mix(in srgb, var(--chilli, #c8102e) 55%, transparent);
+    border-radius: 50% 0;
+    opacity: 0.45;
+
+    &.tl {
+      top: 8px;
+      left: 8px;
+    }
+
+    &.br {
+      right: 8px;
+      bottom: 8px;
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.live-preview__layout {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
 .theme-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));

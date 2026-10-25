@@ -1,0 +1,22 @@
+/* Classic uses App.scss menu styles; polish select + WhatsApp FAB shadow. */
+.menu-tpl--classic {
+  .cuisine-select {
+    .custom-select__trigger {
+      border-radius: 999px;
+      box-shadow:
+        0 12px 28px rgba(22, 18, 16, 0.28),
+        0 3px 8px rgba(22, 18, 16, 0.16);
+    }
+
+    .custom-select__menu {
+      border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(22, 18, 16, 0.24);
+    }
+  }
+
+  .fab {
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.28),
+      0 4px 12px rgba(37, 211, 102, 0.4);
+  }
+}

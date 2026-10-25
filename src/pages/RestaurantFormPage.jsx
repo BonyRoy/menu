@@ -16,6 +16,11 @@ import MenuBuilder, {
 import Spinner, { SpinnerButton } from "../components/Spinner";
 import LocationPicker from "../components/LocationPicker";
 import { DEFAULT_THEME, THEME_PRESETS, resolveTheme } from "../lib/themes";
+import {
+  DEFAULT_TEMPLATE,
+  TEMPLATE_PRESETS,
+  resolveTemplate,
+} from "../menu-templates";
 import "../styles/platform.scss";
 
 const EMPTY_FORM = {
@@ -113,6 +118,7 @@ function snapshotOf({
   existingLogoUrl,
   existingHeroUrl,
   themeId,
+  templateId,
   venue,
 }) {
   return JSON.stringify({
@@ -123,6 +129,7 @@ function snapshotOf({
     existingLogoUrl: existingLogoUrl || "",
     existingHeroUrl: existingHeroUrl || "",
     themeId: themeId || DEFAULT_THEME.id,
+    templateId: templateId || DEFAULT_TEMPLATE.id,
     venue: {
       ...venue,
       tableGroups: (venue?.tableGroups || []).map(({ count, seats }) => ({
@@ -153,8 +160,15 @@ export default function RestaurantFormPage() {
   const [baseline, setBaseline] = useState(null);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [themeId, setThemeId] = useState(DEFAULT_THEME.id);
+  const [templateId, setTemplateId] = useState(DEFAULT_TEMPLATE.id);
   const [venue, setVenue] = useState(() => emptyVenue());
   const [activeTab, setActiveTab] = useState("basic-info");
+
+  const activeTheme = useMemo(() => resolveTheme(themeId), [themeId]);
+  const activeTemplate = useMemo(
+    () => resolveTemplate(templateId),
+    [templateId],
+  );
 
   useEffect(() => {
     if (isEdit) return;
@@ -167,6 +181,7 @@ export default function RestaurantFormPage() {
         existingLogoUrl: null,
         existingHeroUrl: null,
         themeId: DEFAULT_THEME.id,
+        templateId: DEFAULT_TEMPLATE.id,
         venue: emptyVenue(),
       }),
     );
@@ -200,11 +215,13 @@ export default function RestaurantFormPage() {
       };
       const nextMenu = menusToBuilder(data.menu_data);
       const nextThemeId = resolveTheme(data.theme).id;
+      const nextTemplateId = resolveTemplate(data.theme).id;
       const nextVenue = normalizeVenue(data.venue);
 
       setForm(nextForm);
       setMenuBuilder(nextMenu);
       setThemeId(nextThemeId);
+      setTemplateId(nextTemplateId);
       setVenue(nextVenue);
       setExistingLogoUrl(data.logo_url);
       setExistingHeroUrl(data.hero_image_url);
@@ -219,6 +236,7 @@ export default function RestaurantFormPage() {
           existingLogoUrl: data.logo_url,
           existingHeroUrl: data.hero_image_url,
           themeId: nextThemeId,
+          templateId: nextTemplateId,
           venue: nextVenue,
         }),
       );
@@ -239,6 +257,7 @@ export default function RestaurantFormPage() {
         existingLogoUrl,
         existingHeroUrl,
         themeId,
+        templateId,
         venue,
       }) !== baseline
     );
@@ -251,6 +270,7 @@ export default function RestaurantFormPage() {
     existingLogoUrl,
     existingHeroUrl,
     themeId,
+    templateId,
     venue,
   ]);
 
@@ -381,7 +401,7 @@ export default function RestaurantFormPage() {
         logo_url: logoUrl,
         hero_image_url: heroUrl,
         menu_data: menuData,
-        theme: { id: themeId },
+        theme: { id: themeId, template: templateId },
         venue: venueForSave(venue),
       };
 
@@ -468,6 +488,7 @@ export default function RestaurantFormPage() {
             <p className="live-preview__tagline">{form.tagline || "Your restaurant description will appear here."}</p>
             <p className="live-preview__address"><MarkerPin01 /> {form.address || "Add your restaurant location"}</p>
             <div className="live-preview__tabs"><b>Menu</b><span>About</span><span>Photos</span></div>
+            <p className="live-preview__layout">Layout: {activeTemplate.name}</p>
             <h4>Popular Dishes</h4>
             <div className="live-preview__dishes"><span>Featured menu items will appear here</span></div>
           </aside>
@@ -837,6 +858,39 @@ export default function RestaurantFormPage() {
 
           <section className="form-section" id="settings">
             <div className="section-title"><span><Settings01 /></span><div><h2>Theme</h2><p>Set the visual style of your public menu.</p></div></div>
+
+            <h3 className="settings-subhead">Menu layout</h3>
+            <p className="form-hint">
+              Choose the overall look of your public menu page — like a Canva
+              template for the whole experience.
+            </p>
+            <div className="layout-grid">
+              {TEMPLATE_PRESETS.map((preset) => {
+                const active = templateId === preset.id;
+                const Preview = preset.Preview;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={`layout-card ${active ? "is-active" : ""}`}
+                    onClick={() => setTemplateId(preset.id)}
+                    disabled={saving}
+                    aria-pressed={active}
+                  >
+                    <Preview
+                      paper={activeTheme.paper}
+                      accent={activeTheme.accent}
+                    />
+                    <span className="layout-card__meta">
+                      <span className="layout-card__name">{preset.name}</span>
+                      <span className="layout-card__desc">{preset.description}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <h3 className="settings-subhead">Colors</h3>
             <p className="form-hint">
               Pick a look for your public menu — background and highlight
               colors.

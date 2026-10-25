@@ -1,0 +1,483 @@
+.menu-tpl--noir-gold {
+  --ng-bg: #0c0a09;
+  --ng-panel: #14110f;
+  --ng-gold: #c9a227;
+  --ng-gold-soft: #e8d48b;
+  --ng-ink: #f4efe6;
+  --ng-muted: rgba(244, 239, 230, 0.62);
+  --ng-line: rgba(201, 162, 39, 0.35);
+  background: var(--ng-bg);
+  color: var(--ng-ink);
+
+  .drawer__panel {
+    background: var(--ng-panel);
+    color: var(--ng-ink);
+  }
+
+  .drawer__head,
+  .drawer__panel button {
+    color: var(--ng-ink);
+    border-color: var(--ng-line);
+  }
+}
+
+.ng-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  background: transparent;
+  transition: background 0.2s ease;
+
+  &.is-solid {
+    background: rgba(12, 10, 9, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--ng-line);
+  }
+
+  &__menu,
+  &__call {
+    appearance: none;
+    border: 1px solid var(--ng-line);
+    background: transparent;
+    color: var(--ng-gold-soft);
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  &__brand {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    letter-spacing: 0.08em;
+    font-size: 1.15rem;
+    color: var(--ng-gold-soft);
+
+    img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--ng-gold);
+    }
+  }
+}
+
+.ng-hero {
+  padding: 0.75rem 1rem 0.25rem;
+
+  &__frame {
+    position: relative;
+    border: 1px solid var(--ng-gold);
+    border-radius: 4px;
+    overflow: hidden;
+    min-height: min(62vh, 520px);
+    box-shadow: 0 0 0 6px rgba(201, 162, 39, 0.12);
+
+    img {
+      width: 100%;
+      height: 100%;
+      min-height: min(62vh, 520px);
+      object-fit: cover;
+      filter: saturate(0.85) brightness(0.55);
+    }
+  }
+
+  &__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(12, 10, 9, 0.15),
+      rgba(12, 10, 9, 0.82) 70%
+    );
+  }
+
+  &__copy {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 1.5rem 1.25rem 1.75rem;
+    text-align: center;
+  }
+
+  &__eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ng-gold);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 8vw, 3.4rem);
+    letter-spacing: 0.06em;
+    font-weight: 400;
+    color: var(--ng-ink);
+
+    span {
+      display: block;
+      font-size: 0.55em;
+      color: var(--ng-gold-soft);
+    }
+  }
+
+  &__tag {
+    margin: 0.65rem auto 0;
+    max-width: 28ch;
+    color: var(--ng-muted);
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  &__cta {
+    appearance: none;
+    margin-top: 1rem;
+    border: 1px solid var(--ng-gold);
+    background: transparent;
+    color: var(--ng-gold-soft);
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.ng-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0.85rem 1.1rem 0;
+  color: var(--ng-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    margin-top: 0.15rem;
+    color: var(--ng-gold);
+    flex-shrink: 0;
+  }
+
+  a {
+    color: var(--ng-gold-soft);
+  }
+}
+
+.ng-menu {
+  padding: 1.25rem 1rem 2.5rem;
+
+  &__frame {
+    border: 1px solid var(--ng-line);
+    background: var(--ng-panel);
+    border-radius: 2px;
+    padding: 1rem 0.9rem 1.25rem;
+    box-shadow: inset 0 0 0 4px rgba(201, 162, 39, 0.08);
+  }
+
+  &__controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--ng-line);
+
+    h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      letter-spacing: 0.1em;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--ng-gold-soft);
+      text-transform: uppercase;
+    }
+
+    span {
+      font-size: 0.75rem;
+      color: var(--ng-muted);
+    }
+  }
+}
+
+.ng-cuisine {
+  width: 100%;
+
+  .custom-select,
+  .auth-field.custom-select,
+  .ng-cuisine__select {
+    display: block;
+    margin: 0;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .custom-select__root {
+    width: 100%;
+  }
+
+  .custom-select__trigger {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 999px;
+    border: 1px solid var(--ng-line);
+    background: #1c1814;
+    color: var(--ng-gold-soft);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.1rem;
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.45),
+      0 2px 6px rgba(0, 0, 0, 0.28),
+      inset 0 0 0 1px rgba(201, 162, 39, 0.08);
+
+    span {
+      color: var(--ng-gold-soft);
+    }
+
+    svg {
+      width: 1.05rem;
+      height: 1.05rem;
+      color: var(--ng-gold);
+    }
+
+    &:hover:not(:disabled) {
+      background: #241f1a;
+      border-color: var(--ng-gold);
+    }
+
+    &:focus {
+      outline: 2px solid rgba(201, 162, 39, 0.35);
+      border-color: var(--ng-gold);
+    }
+  }
+
+  .custom-select.is-open .custom-select__trigger {
+    border-color: var(--ng-gold);
+    outline: 2px solid rgba(201, 162, 39, 0.28);
+    background: #241f1a;
+  }
+
+  .custom-select__menu {
+    z-index: 45;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 16px;
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    background: #14110f;
+    box-shadow:
+      0 18px 40px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(201, 162, 39, 0.1);
+    max-height: min(50vh, 300px);
+    padding: 0.4rem;
+  }
+
+  .custom-select__option {
+    border-radius: 10px;
+    padding: 0.8rem 0.9rem;
+    font-weight: 600;
+    color: var(--ng-ink);
+    background: transparent;
+
+    &:hover {
+      background: rgba(201, 162, 39, 0.12);
+    }
+
+    &.is-active {
+      background: var(--ng-gold);
+      color: #0c0a09;
+
+      span,
+      .custom-select__check {
+        color: #0c0a09;
+      }
+    }
+  }
+}
+
+.ng-diet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+
+  > svg {
+    width: 14px;
+    height: 14px;
+    color: var(--ng-gold);
+  }
+
+  button {
+    appearance: none;
+    border: 1px solid var(--ng-line);
+    background: transparent;
+    color: var(--ng-muted);
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+
+    &.is-active {
+      color: #0c0a09;
+      background: var(--ng-gold);
+      border-color: var(--ng-gold);
+    }
+  }
+}
+
+.ng-chips {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+
+  button {
+    appearance: none;
+    flex-shrink: 0;
+    border: 1px solid var(--ng-line);
+    background: transparent;
+    color: var(--ng-muted);
+    border-radius: 999px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &.is-active {
+      border-color: var(--ng-gold);
+      color: var(--ng-gold-soft);
+    }
+  }
+}
+
+.ng-section {
+  margin-bottom: 1.35rem;
+  scroll-margin-top: var(--scroll-offset);
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: linear-gradient(90deg, var(--ng-gold), #a8841a);
+    color: #0c0a09;
+    padding: 0.45rem 0.7rem;
+    margin-bottom: 0.35rem;
+
+    h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      font-size: 1.15rem;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    span {
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+  }
+
+  .item {
+    border-bottom-color: rgba(244, 239, 230, 0.12);
+    color: var(--ng-ink);
+
+    &__name {
+      color: var(--ng-ink);
+    }
+
+    &__desc,
+    &__opts {
+      color: var(--ng-muted);
+    }
+
+    .price {
+      color: var(--ng-gold-soft);
+    }
+  }
+}
+
+.ng-footer {
+  padding: 0 1rem 5rem;
+  text-align: center;
+
+  a {
+    color: var(--ng-gold-soft);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.menu-tpl--noir-gold .fab,
+.fab--noir {
+  background: var(--ng-gold) !important;
+  color: #0c0a09 !important;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.55),
+    0 4px 10px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(201, 162, 39, 0.25) !important;
+  animation: none;
+}
+
+@media (min-width: 900px) {
+  .ng-hero__frame {
+    min-height: 420px;
+
+    img {
+      min-height: 420px;
+    }
+  }
+
+  .ng-menu {
+    max-width: 820px;
+    margin: 0 auto;
+    padding-top: 1.75rem;
+  }
+}
